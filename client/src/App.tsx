@@ -7,7 +7,10 @@ import {
 import Layout from "./layouts/Layout";
 import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
+import AddTour from "./pages/AddTour";
+import { useAppContext } from "./contexts/AppContext";
 function App() {
+  const { isLogedIn } = useAppContext();
   return (
     <Router>
       <Routes>
@@ -44,6 +47,18 @@ function App() {
             </Layout>
           }
         />
+        {isLogedIn && (
+          <>
+            <Route
+              path="/add-tour"
+              element={
+                <Layout>
+                  <AddTour />{" "}
+                </Layout>
+              }
+            />
+          </>
+        )}
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
