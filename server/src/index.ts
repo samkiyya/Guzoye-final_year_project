@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
-import createTourRoutes from "./routes/tours";
+import tourRoutes from "./routes/tourRoutes";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
@@ -51,7 +51,7 @@ app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.static(path.join(__dirname, "../../client/dist")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/tours", createTourRoutes);
+app.use("/api/tours", tourRoutes);
 
 app.listen(port, () => {
   connect();

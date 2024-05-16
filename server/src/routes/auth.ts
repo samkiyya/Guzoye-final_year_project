@@ -35,7 +35,7 @@ router.post(
       }
       //creating a jsonwebtoken
       const token = jwt.sign(
-        { userId: user.id },
+        { userId: user.id, role: user.role },
         process.env.JWT_SECRET_KEY as string,
         {
           expiresIn: "1h",
@@ -53,7 +53,7 @@ router.post(
       });
       res.status(200).json({
         UserId: user._id,
-        // message: "User logged in successfully",
+        // message: "User logged in successfully",role:user.role
       });
     } catch (error) {
       console.log(error);
