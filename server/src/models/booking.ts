@@ -1,9 +1,18 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const bookingSchema = new mongoose.Schema(
+export type BookingType = {
+  userId: mongoose.Types.ObjectId;
+  userEmail: string;
+  tourName: string;
+  fullName: string;
+  guestSize: number;
+  phone: number;
+  bookAt: Date;
+};
+const bookingSchema = new mongoose.Schema<BookingType>(
   {
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
     },
     userEmail: {
       type: String,

@@ -73,8 +73,6 @@ export const getSingleUser = async (req: Request, res: Response) => {
 
 //GetAll User
 export const getAllUser = async (req: Request, res: Response) => {
-  //console.log(page)
-
   try {
     const users = await User.find({});
 

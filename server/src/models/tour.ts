@@ -7,6 +7,7 @@ export interface TourType extends Document {
   address: string;
   distance: number;
   desc: string;
+  maxGroupSize: number;
   price: number;
   featured: boolean;
   reviews: string[];
@@ -23,6 +24,7 @@ const tourSchema = new Schema<TourType>(
     address: { type: String, required: true },
     distance: { type: Number, required: true },
     desc: { type: String, required: true },
+    maxGroupSize: { type: Number, required: true },
     price: { type: Number, required: true },
     featured: { type: Boolean, required: true },
     reviews: { type: [String], required: true },

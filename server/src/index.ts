@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 import tourRoutes from "./routes/tourRoutes";
+import reviewRoutes from "./routes/review";
+import bookingRoutes from "./routes/booking";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
@@ -52,6 +54,8 @@ app.use(express.static(path.join(__dirname, "../../client/dist")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tours", tourRoutes);
+app.use("/api/review", reviewRoutes);
+app.use("/api/booking", bookingRoutes);
 
 app.listen(port, () => {
   connect();

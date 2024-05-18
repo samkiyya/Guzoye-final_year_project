@@ -56,7 +56,7 @@ export const createTour = async (req: Request, res: Response) => {
 
     res
       .status(201)
-      .send({ success: true, message: "Successfully created", data: tour });
+      .json({ success: true, message: "Successfully created", data: tour });
   } catch (e) {
     console.error("Error creating Tour: ", e);
     res.status(500).json({ message: "Something went wrong" });
@@ -67,15 +67,25 @@ export const createTour = async (req: Request, res: Response) => {
 export const updateTour = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updatedTour = await Tour.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
+    const updatedTour = await Tour.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      {
+        new: true,
+      }
+    );
     if (!updatedTour) {
       return res.status(404).json({ message: "Tour not found" });
     }
-    res.status(200).json(updatedTour);
+    res.status(200).json({
+      success: true,
+      message: "Successfully updated",
+      data: updatedTour,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error updating tour", error });
+    res
+      .status(500)
+      .json({ success: false, message: "Error updating tour", data: error });
   }
 };
 
@@ -87,18 +97,107 @@ export const deleteTour = async (req: Request, res: Response) => {
     if (!deletedTour) {
       return res.status(404).json({ message: "Tour not found" });
     }
-    res.status(200).json({ message: "Tour deleted successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Tour deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting tour", error });
+    res
+      .status(500)
+      .json({ success: false, message: "Error deleting tour", data: error });
+  }
+};
+//get a single tour
+export const getSingleTour = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const tour = await Tour.findById(id).populate("reviews");
+    res.status(200).json({
+      success: true,
+      message: "Tour fetched successfully",
+      data: tour,
+    });
+  } catch (error) {
+    res
+      .status(404)
+      .json({ success: false, message: "Error fetching tours", data: error });
   }
 };
 
 // Get Tours
 export const getTours = async (req: Request, res: Response) => {
+  //for pagination
+  const page = parseInt(req.query.page as string);
+  console.log(page);
   try {
-    const tours = await Tour.find();
-    res.status(200).json(tours);
+    const tours = await Tour.find({})
+      .populate("reviews")
+      .skip(page * 8)
+      .limit(8);
+    res.status(200).json({
+      success: true,
+      count: tours.length,
+      message: "Tour fetched successfully",
+      data: tours,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching tours", error });
+    res.status(404).json({ message: "Error fetching tours", data: error });
+  }
+};
+
+// Get Tours by searching
+export const getTourBySearch = async (req: Request, res: Response) => {
+  // 'i' means case sensetive
+  const city = new RegExp(req.query.city as string, "i");
+  const distance = new RegExp(req.query.distance as string);
+  const maxGroupSize = new RegExp(req.query.maxGroupSize as string);
+  try {
+    const tours = await Tour.find({
+      city,
+      //$gte means >=
+      distance: { $gte: distance },
+      maxGroupSize: { $gte: maxGroupSize },
+    }).populate("reviews");
+    res.status(200).json({
+      success: true,
+      message: "Tour fetched successfully",
+      data: tours,
+    });
+  } catch (error) {
+    res
+      .status(404)
+      .json({ success: false, message: "Error fetching tours", data: error });
+  }
+};
+
+// GetFeatured tours
+export const getFeaturedTour = async (req: Request, res: Response) => {
+  try {
+    const tours = await Tour.find({ featured: true })
+      .populate("reviews")
+      .limit(8);
+    res.status(200).json({
+      success: true,
+      message: "Tour fetched successfully",
+      data: tours,
+    });
+  } catch (error) {
+    res
+      .status(404)
+      .json({ success: false, message: "Error fetching tours", data: error });
+  }
+};
+
+// get tours count
+export const getTourCount = async (req: Request, res: Response) => {
+  try {
+    const tourCount = await Tour.estimatedDocumentCount();
+    res.status(200).json({
+      success: true,
+      data: tourCount,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to Fetch fetching tours" });
   }
 };
