@@ -8,7 +8,6 @@ import Dashboard from "./pages/Dashboard";
 import ManagerRoute from "./components/ManagerRoute"; // Fixed import path
 import OnlyAdminPrivateRoute from "./components/OnlyAdminPrivateRoute";
 import Search from "./pages/Search";
-import NewPackagePage from "./pages/newPackagePage/NewPackage"; // Fixed import path
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
 import UpdatePackage from "./pages/manager/UpdatePackage";
 import About from "./pages/About";
@@ -30,9 +29,10 @@ export default function App() {
           <Route index element={<Dashboard />} />
         </Route>
 
-        <Route path="/profile/admin" element={<OnlyAdminPrivateRoute />}>
-          <Route index element={<NewPackagePage />} />
-        </Route>
+        <Route
+          path="/profile/admin"
+          element={<OnlyAdminPrivateRoute />}
+        ></Route>
 
         <Route path="/profile/manager" element={<ManagerRoute />}>
           <Route index element={<ManagerDashboard />} />
