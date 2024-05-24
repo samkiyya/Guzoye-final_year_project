@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Outlet, Navigate } from "react-router-dom";
-import Spinner from "./Spinner"; // Ensure this path is correct
+import Spinner from "./spinner"; // Ensure this path is correct
 
 export default function PrivateRoute() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";

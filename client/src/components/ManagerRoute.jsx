@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Outlet, Navigate } from "react-router-dom";
-import Spinner from "./Spinner"; // Fixed import path
+import Spinner from "./spinner"; // Fixed import path
 
 export default function ManagerRoute() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
