@@ -1,103 +1,82 @@
 import { Alert, Spinner } from "flowbite-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
 
-export default function Registration() {
+export default function Login() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    phone: "",
-    isEthiopian: false, // Include checkbox state in form data
-  });
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({});
+
+  const { loading, error: errorMessage } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  useEffect(() => {
+    // Dispatch an action to clear the error message when the component mounts
+    dispatch(signInFailure(null));
+  }, []);
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [id]: value.trim(),
-    }));
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
-
-  const handleCheckboxChange = (e) => {
-    const { checked } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      isEthiopian: checked, // Update checkbox state
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.username || !formData.email || !formData.password) {
-      return setErrorMessage("Please fill out all fields.");
+    if (!formData.email || !formData.password) {
+      return dispatch(signInFailure("Please fill all the fields"));
     }
-
     try {
-      setLoading(true);
-      setErrorMessage(null);
-
-      const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      dispatch(signInStart());
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
       if (data.success === false) {
-        setLoading(false);
-        return setErrorMessage(data.message);
+        return dispatch(signInFailure(data.message));
       }
-      setLoading(false);
+
       if (res.ok) {
-        navigate("/login");
+        dispatch(signInSuccess(data));
+        navigate("/");
       }
     } catch (error) {
-      setErrorMessage(error.message);
-      setLoading(false);
+      dispatch(signInFailure(error.message));
     }
   };
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <a
+          href="#"
+          className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
+        >
+          ጉZOዬ
+        </a>
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Sign Up
+              Login
             </h1>
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label
-                  htmlFor="username"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Username
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  onChange={handleChange}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="username"
-                />
-              </div>
               <div>
                 <label
                   htmlFor="email"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Email
+                  {" "}
+                  email
                 </label>
                 <input
                   type="email"
-                  id="email"
                   onChange={handleChange}
+                  id="email"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="name@.com"
                   required=""
@@ -119,27 +98,6 @@ export default function Registration() {
                   required=""
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="nationality"
-                      onChange={handleCheckboxChange}
-                      aria-describedby="remember"
-                      type="checkbox"
-                      className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="nationality"
-                      className="text-gray-500 dark:text-gray-300"
-                    >
-                      Are you Ethiopian
-                    </label>
-                  </div>
-                </div>
-              </div>
 
               <button
                 type="submit"
@@ -152,24 +110,26 @@ export default function Registration() {
                     <span className="pl-3">Loading...</span>
                   </>
                 ) : (
-                  "Sign Up"
+                  "Sign In"
                 )}
               </button>
 
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Do you have an account yet?{" "}
+                Don&apos;t you have an account yet?{" "}
                 <a
-                  href="/sign-in"
+                  href="/register"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Sign in
                 </a>
               </p>
-              <OAuth />
             </form>
+            <div className="flex justify-center">
+              <OAuth />
+            </div>
 
             {errorMessage && (
-              <Alert className="mt-5" color="failure">
+              <Alert className="mt-5 text-red-600" color="failure">
                 {errorMessage}
               </Alert>
             )}
