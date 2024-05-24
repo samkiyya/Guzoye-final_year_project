@@ -54,9 +54,6 @@ app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
 // serve static files during deployment
 app.use(express.static(path.join(__dirname, "../../client/dist")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
-});
 
 // API routes
 app.use("/api/auth", authRoutes);
