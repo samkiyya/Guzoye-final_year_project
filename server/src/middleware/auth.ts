@@ -9,7 +9,11 @@ declare global {
   }
 }
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const token = req.cookies["auth_token"];
   if (!token) {
     return res.status(401).json({ message: "Authorization denied" });
@@ -20,7 +24,23 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     next();
   } catch (error) {
     console.error("Token verification failed:", error);
-    return res.status(401).json({ message: "Authorization denied" });
+    return res
+      .status(401)
+      .json({ message: "sorry failed to verify it is you" });
   }
 };
-export default verifyToken;
+import User from "../models/user";
+
+export const verifyRole = (allowedRoles: string[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await User.findById(req.userId);
+      if (!user || !allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Forbidden: Access is denied" });
+      }
+      next();
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error", error });
+    }
+  };
+};

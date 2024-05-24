@@ -1,8 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { body } from "express-validator";
-import verifyToken from "../middleware/auth";
-import verifyRole from "../middleware/verifyRole";
+import { verifyToken, verifyRole } from "../middleware/auth";
 import {
   createTour,
   updateTour,
