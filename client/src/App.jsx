@@ -5,7 +5,7 @@ import SignUp from "./pages/Registration";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import Dashboard from "./pages/Dashboard";
-import ManagerRoute from "./pages/Routes/ManagerRoute"; // Fixed import path
+import ManagerRoute from "./components/ManagerRoute"; // Fixed import path
 import OnlyAdminPrivateRoute from "./components/OnlyAdminPrivateRoute";
 import Search from "./pages/Search";
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
