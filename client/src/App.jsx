@@ -5,10 +5,10 @@ import SignUp from "./pages/Registration";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import Dashboard from "./pages/Dashboard";
-import ManagerRoute from "./pages/Routes/ManagerRoute";
+import ManagerRoute from "./components/ManagerRoute"; // Fixed import path
 import OnlyAdminPrivateRoute from "./components/OnlyAdminPrivateRoute";
 import Search from "./pages/Search";
-import NewPackagePage from "./pages/newPackagePage/newPackage";
+import NewPackagePage from "./pages/newPackagePage/NewPackage"; // Fixed import path
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
 import UpdatePackage from "./pages/manager/UpdatePackage";
 import About from "./pages/About";
@@ -23,58 +23,29 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/register" element={<SignUp />} />
         <Route path="/search" element={<Search />} />
-        {/* Adjusted traveler route */}
-        <Route
-          path="/profile/traveler"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
 
-        {/* Adjusted admin route */}
-        <Route
-          path="/profile/create-package"
-          element={
-            <OnlyAdminPrivateRoute>
-              <NewPackagePage />
-            </OnlyAdminPrivateRoute>
-          }
-        />
+        <Route path="/profile/traveler" element={<PrivateRoute />}>
+          <Route index element={<Dashboard />} />
+        </Route>
 
-        {/* Adjusted manager route */}
-        <Route
-          path="/profile/admin"
-          element={
-            <ManagerRoute>
-              <ManagerDashboard />
-            </ManagerRoute>
-          }
-        />
-        <Route
-          path="/profile/admin/update-package/:id"
-          element={
-            <ManagerRoute>
-              <UpdatePackage />
-            </ManagerRoute>
-          }
-        />
+        <Route path="/profile/admin" element={<OnlyAdminPrivateRoute />}>
+          <Route index element={<NewPackagePage />} />
+        </Route>
+
+        <Route path="/profile/manager" element={<ManagerRoute />}>
+          <Route index element={<ManagerDashboard />} />
+          <Route path="update-package/:id" element={<UpdatePackage />} />
+        </Route>
 
         <Route path="/about" element={<About />} />
         <Route path="/package/:id" element={<Package />} />
         <Route path="/package/ratings/:id" element={<RatingsPage />} />
-        {/* Adjusted booking route */}
-        <Route
-          path="/booking/:packageId"
-          element={
-            <PrivateRoute>
-              <Booking />
-            </PrivateRoute>
-          }
-        />
+
+        <Route path="/booking/:packageId" element={<PrivateRoute />}>
+          <Route index element={<Booking />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

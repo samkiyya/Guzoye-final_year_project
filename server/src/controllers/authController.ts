@@ -187,27 +187,23 @@ export const googleAuth = async (req: Request, res: Response) => {
     });
   }
 };
-
 // user log out
 export const logout = async (req: Request, res: Response) => {
   try {
     res.cookie("auth_token", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 0, // set to 0 to expires imediately
+      maxAge: 0, // set to 0 to expires immediately
     });
     res.status(200).send({
       success: true,
-      message: "logged out successfully",
+      message: "Logged out successfully",
     });
-    // Redirect the user to the login page or home page
-    res.redirect("/login");
   } catch (err) {
     console.log(err);
     res.status(500).send({
       success: false,
       message: "Something went wrong, please try to logout again",
     });
-    res.end();
   }
 };
