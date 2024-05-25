@@ -50,7 +50,7 @@ const Package = () => {
     packageId: params?.id,
     userRef: currentUser?._id,
     username: currentUser?.username,
-    userProfileImg: currentUser?.avatar,
+    userProfileImg: currentUser?.photo,
   });
   const [packageRatings, setPackageRatings] = useState([]);
   const [ratingGiven, setRatingGiven] = useState(false);

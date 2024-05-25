@@ -1,0 +1,24 @@
+.chatbot-popup {
+  position: fixed;
+  bottom: 80px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
+  z-index: 9999; /* Ensure it's above other elements */
+}
+
+.chatbot-button-popup {
+  position: fixed;
+  bottom: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
+  z-index: 9999;
+  background-color: #5acc9a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.chatbot-button-popup:hover {
+  background-color: #48a37f;
+}

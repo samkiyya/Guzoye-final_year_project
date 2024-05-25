@@ -43,7 +43,7 @@ const ManagerDashboard = () => {
     email: "",
     address: "",
     phone: "",
-    avatar: "",
+    photo: "",
   });
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const ManagerDashboard = () => {
         email: currentUser.email,
         address: currentUser.address,
         phone: currentUser.phone,
-        avatar: currentUser.avatar,
+        photo: currentUser.photo,
       });
     }
   }, [currentUser]);
@@ -88,13 +88,13 @@ const ManagerDashboard = () => {
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ avatar: downloadUrl }),
+                body: JSON.stringify({ photo: downloadUrl }),
               }
             );
             const data = await res.json();
             if (data?.success) {
               alert(data?.message);
-              setFormData({ ...formData, avatar: downloadUrl });
+              setFormData({ ...formData, photo: downloadUrl });
               dispatch(updateSuccess(data?.user));
               setProfilePhoto(null);
             } else {
@@ -170,7 +170,7 @@ const ManagerDashboard = () => {
                 <img
                   src={
                     (profilePhoto && URL.createObjectURL(profilePhoto)) ||
-                    formData.avatar
+                    formData.photo
                   }
                   alt="Profile photo"
                   className="w-64 min-h-52 max-h-64 rounded-lg"

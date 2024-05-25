@@ -111,10 +111,10 @@ export default function DashboardComp() {
           columns={[
             {
               label: "User image",
-              key: "profilePicture",
+              key: "photo",
               render: (user) => (
                 <img
-                  src={user.profilePicture}
+                  src={user.photo}
                   alt="user"
                   className="w-10 h-10 rounded-full bg-gray-500"
                 />

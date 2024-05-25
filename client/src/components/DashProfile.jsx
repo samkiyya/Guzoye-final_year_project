@@ -49,7 +49,7 @@ export default function Profile() {
     email: "",
     phone: "",
     address: "",
-    avatar: "",
+    photo: "",
   });
 
   useEffect(() => {
@@ -59,9 +59,9 @@ export default function Profile() {
         email: currentUser.email,
         address: currentUser.address,
         phone: currentUser.phone,
-        avatar: currentUser.avatar,
+        photo: currentUser.photo,
       });
-      setImageFileUrl(currentUser.avatar);
+      setImageFileUrl(currentUser.photo);
     }
   }, [currentUser]);
 
@@ -106,7 +106,7 @@ export default function Profile() {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setImageFileUrl(downloadURL);
-          setFormData({ ...formData, avatar: downloadURL });
+          setFormData({ ...formData, photo: downloadURL });
           setImageFileUploading(false);
         });
       }
@@ -236,7 +236,7 @@ export default function Profile() {
             />
           )}
           <img
-            src={imageFileUrl || currentUser.avatar}
+            src={imageFileUrl || currentUser.photo}
             alt="user"
             className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${
               imageFileUploadProgress &&

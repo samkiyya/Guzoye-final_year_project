@@ -61,7 +61,7 @@ export default function Header() {
             inline
             label={
               <div className="w-12">
-                <Avatar alt="user" img={currentUser.avatar} rounded />
+                <Avatar alt="user" img={currentUser.photo} rounded />
               </div>
             }
             className="p-5"
@@ -72,7 +72,7 @@ export default function Header() {
                 {currentUser.email}
               </span>
             </Dropdown.Header>
-            <Link to="/profile">
+            <Link to="/profile/traveler">
               <Dropdown.Item>Profile</Dropdown.Item>
             </Link>
             <Link to="/my-bookings">

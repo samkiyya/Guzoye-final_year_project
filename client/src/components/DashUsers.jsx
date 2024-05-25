@@ -109,7 +109,7 @@ export default function DashUsers() {
                   </th>
                   <td className="px-6 py-4">
                     <img
-                      src={user.profilePicture}
+                      src={user.photo}
                       alt={user.username}
                       className="w-10 h-10 object-cover bg-gray-500 rounded-full"
                     />

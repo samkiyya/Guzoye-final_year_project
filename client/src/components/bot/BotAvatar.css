@@ -1,0 +1,11 @@
+.BotAvatar {
+  width: 33px;
+  height: 33px;
+  border-radius: 25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  background-color: rgba(29, 34, 104, 0.836);
+  color: floralwhite;
+}

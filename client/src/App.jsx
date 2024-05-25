@@ -1,7 +1,11 @@
+import "./ axios-config"; // Ensure this import is at the top
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import PackageHome from "./pages/PackageHome";
 import Home from "./pages/Home";
-import SignIn from "./pages/Login";
-import SignUp from "./pages/Registration";
+import GuzoyeBot from "./pages/user/GuzoyeBot";
+import Login from "./pages/Login";
+import Register from "./pages/Registration";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import Dashboard from "./pages/Dashboard";
@@ -18,35 +22,40 @@ import Booking from "./pages/user/Booking";
 export default function App() {
   return (
     <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<SignIn />} />
-        <Route path="/register" element={<SignUp />} />
-        <Route path="/search" element={<Search />} />
+      <AuthProvider>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/packages" element={<PackageHome />} />
 
-        <Route path="/profile/traveler" element={<PrivateRoute />}>
-          <Route index element={<Dashboard />} />
-        </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/search" element={<Search />} />
 
-        <Route
-          path="/profile/admin"
-          element={<OnlyAdminPrivateRoute />}
-        ></Route>
+          <Route path="/profile/traveler" element={<PrivateRoute />}>
+            <Route index element={<Dashboard />} />
+          </Route>
 
-        <Route path="/profile/manager" element={<ManagerRoute />}>
-          <Route index element={<ManagerDashboard />} />
-          <Route path="update-package/:id" element={<UpdatePackage />} />
-        </Route>
+          <Route
+            path="/profile/admin"
+            element={<OnlyAdminPrivateRoute />}
+          ></Route>
 
-        <Route path="/about" element={<About />} />
-        <Route path="/package/:id" element={<Package />} />
-        <Route path="/package/ratings/:id" element={<RatingsPage />} />
+          <Route path="/profile/manager" element={<ManagerRoute />}>
+            <Route index element={<ManagerDashboard />} />
+            <Route path="update-package/:id" element={<UpdatePackage />} />
+          </Route>
 
-        <Route path="/booking/:packageId" element={<PrivateRoute />}>
-          <Route index element={<Booking />} />
-        </Route>
-      </Routes>
+          <Route path="/about" element={<About />} />
+          <Route path="/package/:id" element={<Package />} />
+          <Route path="/package/ratings/:id" element={<RatingsPage />} />
+
+          <Route path="/booking/:packageId" element={<PrivateRoute />}>
+            <Route index element={<Booking />} />
+          </Route>
+        </Routes>
+        <GuzoyeBot />
+      </AuthProvider>
     </BrowserRouter>
   );
 }
