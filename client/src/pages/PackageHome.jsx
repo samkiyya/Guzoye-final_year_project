@@ -6,7 +6,7 @@ import { LuBadgePercent } from "react-icons/lu";
 import PackageCard from "./PackageCard";
 import { useNavigate } from "react-router";
 
-const Home = () => {
+const PackageHome = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
   const navigate = useNavigate();
@@ -201,4 +201,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default PackageHome;
