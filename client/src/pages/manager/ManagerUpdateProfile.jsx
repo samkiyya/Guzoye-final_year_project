@@ -22,7 +22,7 @@ const ManagerUpdateProfile = () => {
     username: "",
     address: "",
     phone: "",
-    photo: "",
+    userProfileImg: "",
   });
   const [updatePassword, setUpdatePassword] = useState({
     oldpassword: "",
@@ -35,7 +35,7 @@ const ManagerUpdateProfile = () => {
         username: currentUser.username,
         address: currentUser.address,
         phone: currentUser.phone,
-        photo: currentUser.photo,
+        userProfileImg: currentUser.userProfileImg,
       });
     }
   }, [currentUser]);

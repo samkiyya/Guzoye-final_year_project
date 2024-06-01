@@ -1,8 +1,8 @@
 .chatbot-popup {
   position: fixed;
-  bottom: 80px; /* Adjust as needed */
-  right: 20px; /* Adjust as needed */
-  z-index: 9999; /* Ensure it's above other elements */
+  bottom: 80px;
+  right: 20px;
+  z-index: 9999;
 }
 
 .chatbot-button-popup {
@@ -20,5 +20,5 @@
 }
 
 .chatbot-button-popup:hover {
-  background-color: #48a37f;
+  background-color: #4aab80;
 }

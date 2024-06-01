@@ -12,6 +12,8 @@ export type BookingType = {
   date: string;
   status: string;
   bookAt: Date;
+  createdAt?: Date; // Optional, added because of timestamps: true in schema
+  updatedAt?: Date;
 };
 const bookingSchema = new mongoose.Schema<BookingType>(
   {

@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 import tourRoutes from "./routes/tourRoutes";
@@ -9,7 +10,6 @@ import packageRoutes from "./routes/package";
 import reviewRoutes from "./routes/review";
 import bookingRoutes from "./routes/booking";
 import chapaRoutes from "./routes/chapaRoutes";
-import cookieParser from "cookie-parser";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
 dotenv.config({});
@@ -21,8 +21,11 @@ cloudinary.config({
 });
 
 const app = express();
-const port = process.env.PORT || 7000;
-
+const port = process.env.PORT || 8000;
+const corsOptions = {
+  origin: process.env.FRONTEND_URL, //true
+  credentials: true,
+};
 // Database connection
 const connect = async () => {
   try {
@@ -42,10 +45,10 @@ const connect = async () => {
 };
 
 // Middlewares
-app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+app.use(cors(corsOptions));
+app.use(cookieParser());
 
 // Serve static files during deployment
 app.use(express.static(path.join(__dirname, "../../client/dist")));

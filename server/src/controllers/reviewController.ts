@@ -11,10 +11,9 @@ export const createReview = async (req: Request, res: Response) => {
   }
   const tourId = req.params.tourId;
 
-  const newReview = await Review.create(req.body);
+  const newReview = await Review.create(...req.body);
 
   try {
-    const newReview = await Review.create(req.body);
     if (newReview) {
       const ratings = await Review.find({ packageId: tourId });
       let totalRatings = await ratings.length;
@@ -31,7 +30,7 @@ export const createReview = async (req: Request, res: Response) => {
       const setPackageRatings = await Tour.findByIdAndUpdate(
         tourId,
         {
-          $set: {
+          $push: {
             packageRating: average_rating,
             packageTotalRatings: totalRatings,
           },

@@ -30,8 +30,8 @@ const GuzoyeBot = () => {
         <Chatbot
           config={config}
           actionProvider={ActionProvider}
-          messageHistory={loadMessages()}
           messageParser={MessageParser}
+          messageHistory={loadMessages()}
           saveMessages={saveMessages}
         />
       )}

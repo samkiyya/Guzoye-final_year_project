@@ -1,5 +1,5 @@
 import { createChatBotMessage } from "react-chatbot-kit";
-import BotAvatar from "./BotAvatar"; // Ensure this path is correct
+import BotAvatar from "./BotAvatar";
 
 const botName = "GuzoyeBot";
 

@@ -114,7 +114,7 @@ export default function DashboardComp() {
               key: "photo",
               render: (user) => (
                 <img
-                  src={user.photo}
+                  src={user.userProfileImg}
                   alt="user"
                   className="w-10 h-10 rounded-full bg-gray-500"
                 />

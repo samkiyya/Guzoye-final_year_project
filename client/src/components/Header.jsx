@@ -1,12 +1,31 @@
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { signoutSuccess } from "../redux/user/userSlice";
 import { toggleTheme } from "../redux/theme/themeSlice";
 
-export default function Header() {
+const nav__links = [
+  {
+    path: "/",
+    display: "Home",
+  },
+  {
+    path: "/about",
+    display: "About",
+  },
+  {
+    path: "/tours",
+    display: "Tours",
+  },
+  {
+    path: "/packages",
+    display: "Packages",
+  },
+];
+const Header = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+  const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const { theme } = useSelector((state) => state.theme);
@@ -21,6 +40,7 @@ export default function Header() {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());
+        navigate("/");
       }
     } catch (error) {
       console.log(error.message);
@@ -37,9 +57,11 @@ export default function Header() {
       </Link>
 
       <div className="flex flex-row gap-10">
-        <Link to="/">Home</Link>
-        <Link to="/packages">Packages</Link>
-        <Link to="/about">About</Link>
+        {nav__links.map((item, index) => (
+          <Link key={index} to={item.path}>
+            {item.display}
+          </Link>
+        ))}
       </div>
 
       <div className="flex gap-2">
@@ -61,7 +83,7 @@ export default function Header() {
             inline
             label={
               <div className="w-12">
-                <Avatar alt="user" img={currentUser.photo} rounded />
+                <Avatar alt="user" img={currentUser.userProfileImg} rounded />
               </div>
             }
             className="p-5"
@@ -72,7 +94,7 @@ export default function Header() {
                 {currentUser.email}
               </span>
             </Dropdown.Header>
-            <Link to="/profile/traveler">
+            <Link to="/profile/user">
               <Dropdown.Item>Profile</Dropdown.Item>
             </Link>
             <Link to="/my-bookings">
@@ -89,19 +111,16 @@ export default function Header() {
           </Dropdown>
         ) : (
           <>
-            <Link to="/login">
-              <Button gradientDuoTone="purpleToBlue" className="text-black">
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/register">
-              <Button gradientDuoTone="purpleToBlue" className="text-black">
-                Register
-              </Button>
-            </Link>
+            <Button gradientDuoTone="purpleToBlue" className="text-black">
+              <Link to="/login">Sign In</Link>
+            </Button>
+            <Button gradientDuoTone="purpleToBlue" className="text-black">
+              <Link to="/register">Register</Link>
+            </Button>
           </>
         )}
       </div>
     </Navbar>
   );
-}
+};
+export default Header;

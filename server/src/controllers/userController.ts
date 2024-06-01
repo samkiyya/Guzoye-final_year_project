@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import User from "../models/user";
 import bcrypt from "bcryptjs";
-import { NumericLiteral } from "typescript";
+import User, { UserType } from "../models/user";
 
-//Create new User
+//Create or register a new User
 export const createUser = async (req: Request, res: Response) => {
-  const newUser = new User(req.body);
+  const newUser = new User(req.body) as UserType;
   if (req.body.password) {
     if (req.body.password.length < 8) {
       return res.status(400).json({
@@ -70,12 +69,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const updatedUser = await User.findByIdAndUpdate(
       id,
       {
-        $set: {
-          username: req.body.username,
-          email: req.body.email,
-          address: req.body.address,
-          phone: req.body.phone,
-        },
+        $set: req.body,
       },
       { new: true }
     );
@@ -114,7 +108,7 @@ export const updateProfilePhoto = async (req: Request, res: Response) => {
       id,
       {
         $set: {
-          photo: req.body.photo,
+          userProfileImg: req.body.userProfileImg,
         },
       },
       { new: true }

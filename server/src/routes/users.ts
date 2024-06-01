@@ -36,16 +36,31 @@ router.get(
 );
 
 // Update user profile - Accessible only by specific user
-router.put("/update/:id", verifyToken, updateUser);
+router.put("/:id", verifyToken, verifyRole(["traveler"]), updateUser);
 
 //update user profile photo
-router.post("/update-profile-photo/:id", verifyToken, updateProfilePhoto);
+router.post(
+  "/update-profile-photo/:id",
+  verifyToken,
+  verifyRole(["traveler"]),
+  updateProfilePhoto
+);
 
 //update user password
-router.post("/update-password/:id", verifyToken, updateUserPassword);
+router.post(
+  "/update-password/:id",
+  verifyToken,
+  verifyRole(["traveler"]),
+  updateUserPassword
+);
 
 //delete user account
-router.delete("/delete/:id", verifyToken, deleteUserAccount);
+router.delete(
+  "/delete/:id",
+  verifyToken,
+  verifyRole(["traveler"]),
+  deleteUserAccount
+);
 
 //admin delete user accounts
 router.delete("/:id", verifyToken, verifyRole(["admin"]), deleteUser);
@@ -53,6 +68,6 @@ router.delete("/:id", verifyToken, verifyRole(["admin"]), deleteUser);
 //get single user - Accessible by all users but only thiers
 router.get("/:id", verifyToken, getSingleUser);
 
-// Get all user - Accessible by travelers and manager
+// Get all user - Accessible by admin and manager
 router.get("/", verifyToken, verifyRole(["manager", "admin"]), getAllUser);
 export default router;

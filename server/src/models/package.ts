@@ -18,6 +18,8 @@ export type PackageType = {
   packageTotalRatings: number;
   packageImages: string[];
   bookAt: Date;
+  createdAt?: Date; // Optional, added because of timestamps: true in schema
+  updatedAt?: Date;
 };
 const packageSchema = new mongoose.Schema<PackageType>(
   {

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import "./home.css";
+import "./Tours.css";
 import { FaCalendar, FaStar } from "react-icons/fa";
 import { FaRankingStar } from "react-icons/fa6";
 import { LuBadgePercent } from "react-icons/lu";
 import PackageCard from "./PackageCard";
 import { useNavigate } from "react-router";
 
-const PackageHome = () => {
+const Packages = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
   const navigate = useNavigate();
@@ -201,4 +201,4 @@ const PackageHome = () => {
   );
 };
 
-export default PackageHome;
+export default Packages;

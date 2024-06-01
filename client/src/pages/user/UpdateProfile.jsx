@@ -23,7 +23,7 @@ const UpdateProfile = () => {
     email: "",
     address: "",
     phone: "",
-    photo: "",
+    userProfileImg: "",
   });
   const [updatePassword, setUpdatePassword] = useState({
     oldpassword: "",
@@ -37,7 +37,7 @@ const UpdateProfile = () => {
         email: currentUser.email,
         address: currentUser.address,
         phone: currentUser.phone,
-        photo: currentUser.photo,
+        userProfileImg: currentUser.userProfileImg,
       });
     }
   }, [currentUser]);

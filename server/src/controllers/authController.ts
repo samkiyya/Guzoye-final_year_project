@@ -1,14 +1,10 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import User, { UserType } from "../models/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const register = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const register = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -16,14 +12,15 @@ export const register = async (
 
   try {
     const {
+      firstName,
+      lastName,
       username,
       email,
       password,
-      firstName,
-      lastName,
-      photo,
+      userProfileImg,
       isEthiopian,
-    } = req.body;
+      role,
+    } = req.body as UserType;
 
     let user = await User.findOne({ $or: [{ email }, { username }] });
     if (user) {
@@ -39,8 +36,9 @@ export const register = async (
       username,
       email,
       password: hashedPassword,
-      photo,
+      userProfileImg,
       isEthiopian,
+      role,
     });
 
     await newUser.save();
@@ -79,12 +77,12 @@ export const login = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found or Invalid Credentials",
+        message: "User not found",
       });
     }
     // if user exist check if password is correct
     const isMatch = await bcrypt.compare(password, user.password);
-    // if password is not correct return custome message
+    // if password is incorrect return custome message
     if (!isMatch) {
       return res
         .status(400)
@@ -98,7 +96,7 @@ export const login = async (req: Request, res: Response) => {
         expiresIn: "1h",
       }
     );
-    // set token in the browsers cookie and send the response to client
+    // set token in the browsers cookies and send the response to the client
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -120,7 +118,7 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const googleAuth = async (req: Request, res: Response) => {
-  const { email, name, photo } = req.body;
+  const { email, name, userProfileImg } = req.body;
   try {
     let user = await User.findOne({ email });
     // if user already exist
@@ -157,7 +155,7 @@ export const googleAuth = async (req: Request, res: Response) => {
         username: username,
         email: email,
         password: hashedPassword,
-        photo: photo,
+        userProfileImg: userProfileImg,
       });
       try {
         await newUser.save();

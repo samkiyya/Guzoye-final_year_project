@@ -1,5 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
+import User from "../models/user";
 
 declare global {
   namespace Express {
@@ -16,11 +17,18 @@ export const verifyToken = (
 ) => {
   const token = req.cookies["auth_token"];
   if (!token) {
-    return res.status(401).json({ message: "Authorization denied" });
+    return res.status(401).json({
+      success: false,
+      message: "Authorization denied, You are not authorized!",
+    });
   }
+  // if token is exist then verify the token
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
-    req.userId = (decoded as JwtPayload).userId;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET_KEY as string
+    ) as JwtPayload;
+    req.userId = decoded.userId;
     next();
   } catch (error) {
     console.error("Token verification failed:", error);
@@ -29,13 +37,12 @@ export const verifyToken = (
       .json({ message: "sorry failed to verify it is you" });
   }
 };
-import User from "../models/user";
 
 export const verifyRole = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = await User.findById(req.userId);
-      if (!user || !allowedRoles.includes(user.role)) {
+      if (!user || !allowedRoles?.includes(user.role)) {
         return res.status(403).json({ message: "Forbidden: Access is denied" });
       }
       next();

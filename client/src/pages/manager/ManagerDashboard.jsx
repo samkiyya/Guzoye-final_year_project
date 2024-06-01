@@ -35,7 +35,7 @@ const ManagerDashboard = () => {
   const dispatch = useDispatch();
   const fileRef = useRef(null);
   const { currentUser, loading } = useSelector((state) => state.user);
-  const [profilePhoto, setProfilePhoto] = useState(undefined);
+  const [userProfileImg, setProfilePhoto] = useState(undefined);
   const [photoPercentage, setPhotoPercentage] = useState(0);
   const [activePanelId, setActivePanelId] = useState(1);
   const [formData, setFormData] = useState({
@@ -43,7 +43,7 @@ const ManagerDashboard = () => {
     email: "",
     address: "",
     phone: "",
-    photo: "",
+    userProfileImg: "",
   });
 
   useEffect(() => {
@@ -53,18 +53,19 @@ const ManagerDashboard = () => {
         email: currentUser.email,
         address: currentUser.address,
         phone: currentUser.phone,
-        photo: currentUser.photo,
+        userProfileImg: currentUser.userProfileImg,
       });
     }
   }, [currentUser]);
 
-  const handleProfilePhoto = async (photo) => {
+  const handleProfilePhoto = async (userProfileImg) => {
     try {
       dispatch(updateStart());
       const storage = getStorage(app);
-      const photoname = new Date().getTime() + photo.name.replace(/\s/g, "");
+      const photoname =
+        new Date().getTime() + userProfileImg.name.replace(/\s/g, "");
       const storageRef = ref(storage, `profile-photos/${photoname}`);
-      const uploadTask = uploadBytesResumable(storageRef, photo);
+      const uploadTask = uploadBytesResumable(storageRef, userProfileImg);
 
       uploadTask.on(
         "state_changed",
@@ -88,13 +89,13 @@ const ManagerDashboard = () => {
                 headers: {
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ photo: downloadUrl }),
+                body: JSON.stringify({ userProfileImg: downloadUrl }),
               }
             );
             const data = await res.json();
             if (data?.success) {
               alert(data?.message);
-              setFormData({ ...formData, photo: downloadUrl });
+              setFormData({ ...formData, userProfileImg: downloadUrl });
               dispatch(updateSuccess(data?.user));
               setProfilePhoto(null);
             } else {
@@ -169,8 +170,8 @@ const ManagerDashboard = () => {
               <div className="w-full flex flex-col items-center relative">
                 <img
                   src={
-                    (profilePhoto && URL.createObjectURL(profilePhoto)) ||
-                    formData.photo
+                    (userProfileImg && URL.createObjectURL(userProfileImg)) ||
+                    formData.userProfileImg
                   }
                   alt="Profile photo"
                   className="w-64 min-h-52 max-h-64 rounded-lg"
@@ -188,7 +189,7 @@ const ManagerDashboard = () => {
                 />
                 <input
                   type="file"
-                  name="photo"
+                  name="userProfileImg"
                   id="photo"
                   hidden
                   ref={fileRef}
@@ -204,10 +205,10 @@ const ManagerDashboard = () => {
                   Choose Photo
                 </label>
               </div>
-              {profilePhoto && (
+              {userProfileImg && (
                 <div className="flex w-full justify-between gap-1">
                   <button
-                    onClick={() => handleProfilePhoto(profilePhoto)}
+                    onClick={() => handleProfilePhoto(userProfileImg)}
                     className="bg-green-700 p-2 text-white mt-3 flex-1 hover:opacity-90"
                   >
                     {loading ? `Uploading...(${photoPercentage}%)` : "Upload"}
