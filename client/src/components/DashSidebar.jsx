@@ -73,6 +73,18 @@ export default function DashSidebar() {
               </Sidebar.Item>
             </Link>
           )}
+          {currentUser && currentUser.role == "manager" && (
+            <Link to="/dashboard?tab=manager">
+              <Sidebar.Item
+                active={tab === "manager" || !tab}
+                icon={HiChartPie}
+                as="div"
+                className="hover:bg-gray-400"
+              >
+                Dashboard
+              </Sidebar.Item>
+            </Link>
+          )}
 
           <Link to="/dashboard?tab=profile">
             <Sidebar.Item
