@@ -23,8 +23,8 @@ cloudinary.config({
 const app = express();
 const port = process.env.PORT || 8000;
 const corsOptions = {
-  origin: process.env.FRONTEND_URL, //true
-  credentials: true,
+  origin: process.env.FRONTEND_URL, //true 
+  credentials: false,
 };
 // Database connection
 const connect = async () => {
@@ -64,7 +64,7 @@ app.use("/api/chapa", chapaRoutes);
 
 // Serve React app for any other route
 app.get("*", (req: Request, res: Response) => {
-  res.sendFile(path.join(__dirname, "../../client/dist/index.html"));
+  res.sendFile(path.join(__dirname, "../../client/index.html"));
 });
 
 // Error handler middleware

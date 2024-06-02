@@ -22,6 +22,7 @@ import Package from "./pages/Package";
 import RatingsPage from "./pages/RatingsPage";
 import Booking from "./pages/user/Booking";
 import DashUsers from "./components/DashUsers";
+import Footer from "./components/Footer/Footer";
 
 export default function App() {
   return (
@@ -57,6 +58,7 @@ export default function App() {
           </Route>
         </Routes>
         <GuzoyeBot />
+        <Footer />
       </AuthProvider>
     </BrowserRouter>
   );
