@@ -23,6 +23,7 @@ const nav__links = [
     display: "Packages",
   },
 ];
+
 const Header = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const Header = () => {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());
-        navigate("/");
+        navigate("/login");
       }
     } catch (error) {
       console.log(error.message);
@@ -64,7 +65,7 @@ const Header = () => {
         ))}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <Button
           className="w-10 hidden sm:inline"
           color="gray"
@@ -89,38 +90,51 @@ const Header = () => {
             className="p-5"
           >
             <Dropdown.Header>
-              <span className="block text-sm">@{currentUser.username}</span>
+              <span className="block text-sm">{currentUser.username}</span>
               <span className="block text-sm font-medium truncate">
                 {currentUser.email}
               </span>
             </Dropdown.Header>
-            <Link to="/profile/user">
+            <Link to="/dashboard?tab=profile">
               <Dropdown.Item>Profile</Dropdown.Item>
             </Link>
-            <Link to="/my-bookings">
+            <Link to="/dashboard?tab=profile?panelId=1">
               <Dropdown.Item>My Bookings</Dropdown.Item>
             </Link>
-            <Link to="/my-history">
-              <Dropdown.Item>My History</Dropdown.Item>
+            <Link to="/schedule">
+              <Dropdown.Item>My Schedule</Dropdown.Item>
             </Link>
-            <Link to="/update-profile">
+            {currentUser.role === "guide" && (
+              <Link to="/quiz">
+                <Dropdown.Item>Take a quiz</Dropdown.Item>
+              </Link>
+            )}
+            <Link to="/dashboard?tab=profile?panelId=2">
               <Dropdown.Item>Update Profile</Dropdown.Item>
+            </Link>
+            <Link to="/dashboard?tab=profile?panelId=3">
+              <Dropdown.Item>My History</Dropdown.Item>
             </Link>
             <Dropdown.Divider />
             <Dropdown.Item onClick={handleSignout}>Sign out</Dropdown.Item>
           </Dropdown>
         ) : (
           <>
-            <Button gradientDuoTone="purpleToBlue" className="text-black">
-              <Link to="/login">Sign In</Link>
-            </Button>
-            <Button gradientDuoTone="purpleToBlue" className="text-black">
-              <Link to="/register">Register</Link>
-            </Button>
+            <Link to="/login">
+              <Button gradientDuoTone="purpleToBlue" className="text-black">
+                Sign In
+              </Button>
+            </Link>
+            <Link to="/register">
+              <Button gradientDuoTone="purpleToBlue" className="text-black">
+                Register
+              </Button>
+            </Link>
           </>
         )}
       </div>
     </Navbar>
   );
 };
+
 export default Header;

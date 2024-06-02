@@ -8,24 +8,32 @@ import {
   updateProfilePhoto,
   updateUserPassword,
   deleteUserAccount,
+  createSchedule,
+  updateSchedule,
+  getSchedule,
+  deleteSchedule,
+  createQuiz,
+  getSingleQuiz,
+  getQuizzes,
+  updateQuiz,
+  deleteQuiz,
 } from "../controllers/userController";
+
 const router = express.Router();
-//user auth
+
+// User authentication routes
 router.get("/user-auth", verifyToken, (req, res) => {
-  return res.status(200).send({ check: true });
+  res.status(200).send({ check: true });
 });
 
-//travel guide auth
 router.get("/guide-auth", verifyToken, verifyRole(["guide"]), (req, res) => {
   res.status(200).send({ check: true });
 });
 
-//admin auth
 router.get("/admin-auth", verifyToken, verifyRole(["admin"]), (req, res) => {
   res.status(200).send({ check: true });
 });
 
-//manager auth
 router.get(
   "/manager-auth",
   verifyToken,
@@ -35,10 +43,9 @@ router.get(
   }
 );
 
-// Update user profile - Accessible only by specific user
+// User routes
 router.put("/:id", verifyToken, verifyRole(["traveler"]), updateUser);
 
-//update user profile photo
 router.post(
   "/update-profile-photo/:id",
   verifyToken,
@@ -46,7 +53,6 @@ router.post(
   updateProfilePhoto
 );
 
-//update user password
 router.post(
   "/update-password/:id",
   verifyToken,
@@ -54,7 +60,6 @@ router.post(
   updateUserPassword
 );
 
-//delete user account
 router.delete(
   "/delete/:id",
   verifyToken,
@@ -62,12 +67,30 @@ router.delete(
   deleteUserAccount
 );
 
-//admin delete user accounts
-router.delete("/:id", verifyToken, verifyRole(["admin"]), deleteUser);
+// Admin routes
+router.delete(
+  "/admin/user/:id",
+  verifyToken,
+  verifyRole(["admin"]),
+  deleteUser
+);
 
-//get single user - Accessible by all users but only thiers
+// User information routes
 router.get("/:id", verifyToken, getSingleUser);
 
-// Get all user - Accessible by admin and manager
 router.get("/", verifyToken, verifyRole(["manager", "admin"]), getAllUser);
+
+// Schedule routes
+router.post("/schedule", createSchedule);
+router.put("/schedule/:id", verifyToken, updateSchedule);
+router.get("/schedule/:id", getSchedule);
+router.delete("/schedule/:id", deleteSchedule);
+
+// Quiz routes
+router.post("/quiz", createQuiz);
+router.get("/quiz/:id", getSingleQuiz);
+router.get("/quiz", getQuizzes);
+router.put("/quiz/:id", updateQuiz);
+router.delete("/quiz/:id", deleteQuiz);
+
 export default router;

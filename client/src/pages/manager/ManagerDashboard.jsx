@@ -22,12 +22,12 @@ import { app } from "../../firebase";
 import AllBookings from "./AllBookings";
 import AdminUpdateProfile from "./ManagerUpdateProfile";
 import AddPackages from "./AddPackages";
-import "./styles/DashboardStyle.css";
 import AllPackages from "./AllPackages";
 import AllUsers from "./AllUsers";
 import Payments from "./Payments";
 import RatingsReviews from "./RatingsReviews";
 import History from "./History";
+import "./styles/DashboardStyle.css";
 
 const ManagerDashboard = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
@@ -174,7 +174,7 @@ const ManagerDashboard = () => {
                     formData.userProfileImg
                   }
                   alt="Profile photo"
-                  className="w-64 min-h-52 max-h-64 rounded-lg"
+                  className="w-64 min-h-52 max-h-64 rounded-lg cursor-pointer"
                   onClick={() => fileRef.current.click()}
                   onMouseOver={() => {
                     document
@@ -267,98 +267,38 @@ const ManagerDashboard = () => {
             <div className="main-div">
               <nav className="w-full border-blue-500 border-b-4 overflow-x-auto navbar">
                 <div className="w-full flex gap-2">
-                  <button
-                    className={
-                      activePanelId === 1
-                        ? "p-1 rounded-t transition-all duration-300 text-nowrap bg-blue-500 text-white"
-                        : "p-1 rounded-t transition-all duration-300 text-nowrap"
-                    }
-                    onClick={() => setActivePanelId(1)}
-                  >
-                    Bookings
-                  </button>
-                  <button
-                    className={
-                      activePanelId === 2
-                        ? "p-1 rounded-t transition-all duration-300 text-nowrap bg-blue-500 text-white"
-                        : "p-1 rounded-t transition-all duration-300 text-nowrap"
-                    }
-                    onClick={() => setActivePanelId(2)}
-                  >
-                    Add Packages
-                  </button>
-                  <button
-                    className={
-                      activePanelId === 3
-                        ? "p-1 rounded-t transition-all duration-300 text-nowrap bg-blue-500 text-white"
-                        : "p-1 rounded-t transition-all duration-300 text-nowrap"
-                    }
-                    onClick={() => setActivePanelId(3)}
-                  >
-                    All Packages
-                  </button>
-                  <button
-                    className={
-                      activePanelId === 4
-                        ? "p-1 rounded-t transition-all duration-300 text-nowrap bg-blue-500 text-white"
-                        : "p-1 rounded-t transition-all duration-300 text-nowrap"
-                    }
-                    onClick={() => setActivePanelId(4)}
-                  >
-                    Users
-                  </button>
-                  <button
-                    className={
-                      activePanelId === 5
-                        ? "p-1 rounded-t transition-all duration-300 text-nowrap bg-blue-500 text-white"
-                        : "p-1 rounded-t transition-all duration-300 text-nowrap"
-                    }
-                    onClick={() => setActivePanelId(5)}
-                  >
-                    Payments
-                  </button>
-                  <button
-                    className={
-                      activePanelId === 6
-                        ? "p-1 rounded-t transition-all duration-300 text-nowrap bg-blue-500 text-white"
-                        : "p-1 rounded-t transition-all duration-300 text-nowrap"
-                    }
-                    onClick={() => setActivePanelId(6)}
-                  >
-                    Ratings/Reviews
-                  </button>
-                  <button
-                    className={
-                      activePanelId === 7
-                        ? "p-1 rounded-t transition-all duration-300 text-nowrap bg-blue-500 text-white"
-                        : "p-1 rounded-t transition-all duration-300 text-nowrap"
-                    }
-                    onClick={() => setActivePanelId(7)}
-                  >
-                    History
-                  </button>
+                  {[
+                    "Bookings",
+                    "Add Packages",
+                    "All Packages",
+                    "Users",
+                    "Payments",
+                    "Ratings/Reviews",
+                    "History",
+                  ].map((item, index) => (
+                    <button
+                      key={index}
+                      className={
+                        activePanelId === index + 1
+                          ? "p-1 rounded-t transition-all duration-300 text-nowrap bg-blue-500 text-white"
+                          : "p-1 rounded-t transition-all duration-300 text-nowrap"
+                      }
+                      onClick={() => setActivePanelId(index + 1)}
+                    >
+                      {item}
+                    </button>
+                  ))}
                 </div>
               </nav>
               <div className="content-div flex flex-wrap">
-                {activePanelId === 1 ? (
-                  <AllBookings />
-                ) : activePanelId === 2 ? (
-                  <AddPackages />
-                ) : activePanelId === 3 ? (
-                  <AllPackages />
-                ) : activePanelId === 4 ? (
-                  <AllUsers />
-                ) : activePanelId === 5 ? (
-                  <Payments />
-                ) : activePanelId === 6 ? (
-                  <RatingsReviews />
-                ) : activePanelId === 7 ? (
-                  <History />
-                ) : activePanelId === 8 ? (
-                  <AdminUpdateProfile />
-                ) : (
-                  <div>Page Not Found!</div>
-                )}
+                {activePanelId === 1 && <AllBookings />}
+                {activePanelId === 2 && <AddPackages />}
+                {activePanelId === 3 && <AllPackages />}
+                {activePanelId === 4 && <AllUsers />}
+                {activePanelId === 5 && <Payments />}
+                {activePanelId === 6 && <RatingsReviews />}
+                {activePanelId === 7 && <History />}
+                {activePanelId === 8 && <AdminUpdateProfile />}
               </div>
             </div>
           </div>

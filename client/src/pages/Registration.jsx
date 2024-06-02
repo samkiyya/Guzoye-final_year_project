@@ -3,8 +3,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
 export default function Registration() {
-  // const [isEthiopian, setIsEthiopian] = useState(false);
-
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
   const handleCheckboxChange = (e) => {
@@ -12,36 +10,38 @@ export default function Registration() {
       formData.isEthiopian = true;
     }
   };
-
   const [formData, setFormData] = useState({
+    firstName: "",
+    LastName: "",
     username: "",
     email: "",
     password: "",
     phone: "",
+    isEthiopian: false,
   });
   const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value.trim(),
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.username || !formData.email || !formData.password) {
+    if (
+      !formData.firstName ||
+      !formData.LastName ||
+      !formData.username ||
+      !formData.email ||
+      !formData.password
+    ) {
       return setErrorMessage("Please fill out all fields.");
     }
-    // const isEthiopian = document.getElementById("nationality").checked;
-
     try {
       setLoading(true);
       setErrorMessage(null);
-
-      // const dataToSend = { ...formData, isEthiopian };
 
       const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
@@ -65,9 +65,6 @@ export default function Registration() {
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        {/* <a href="#" className=="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-         ጉZOዬ
-      </a> */}
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -186,12 +183,12 @@ export default function Registration() {
               </button>
 
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Do you have an account yet?{" "}
+                Do you have an account?{" "}
                 <a
                   href="/login"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
-                  Sign in
+                  Login
                 </a>
               </p>
               <OAuth />
