@@ -10,19 +10,22 @@ import Login from "./pages/Login";
 import Register from "./pages/Registration";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
-import DashProfile from "./components/DashProfile";
+// import DashProfile from "./components/DashProfile";
 import Dashboard from "./pages/Dashboard";
 import ManagerRoute from "./components/ManagerRoute"; // Fixed import path
 import OnlyAdminPrivateRoute from "./components/OnlyAdminPrivateRoute";
 import Search from "./pages/Search";
 import ManagerDashboard from "./pages/manager/ManagerDashboard";
 import UpdatePackage from "./pages/manager/UpdatePackage";
+import Schedule from "./pages/Schedule";
 import About from "./pages/About";
 import Package from "./pages/Package";
 import RatingsPage from "./pages/RatingsPage";
 import Booking from "./pages/user/Booking";
 import DashUsers from "./components/DashUsers";
 import Footer from "./components/Footer/Footer";
+import CreateSchedule from "./pages/ScheduleForm";
+import Quiz from "./pages/Quiz";
 
 export default function App() {
   return (
@@ -31,19 +34,23 @@ export default function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/packages" element={<Packages />} />
-          <Route path="/tours" element={<Tours />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/packages" element={<Packages />} />
+          <Route path="/tours" element={<Tours />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/profile" element={<PrivateRoute />}>
-            <Route path="user" element={<DashProfile />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/createSchedule" element={<CreateSchedule />} />
+            <Route path="/quiz" element={<Quiz />} />
           </Route>
-          <Route path="/profile/admin" element={<OnlyAdminPrivateRoute />}>
+          <Route element={<OnlyAdminPrivateRoute />}>
             <Route path="" element={<DashUsers />} />
             <Route path="all-users" element={<Dashboard />} />
           </Route>
-          <Route path="/profile/manager" element={<ManagerRoute />}>
+          <Route element={<ManagerRoute />}>
             <Route index element={<ManagerDashboard />} />
             <Route path="all-packages" element={<ManagerDashboard />} />
             <Route path="add-package" element={<ManagerDashboard />} />

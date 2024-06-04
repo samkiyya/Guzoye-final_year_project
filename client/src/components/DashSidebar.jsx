@@ -6,12 +6,13 @@ import {
   HiChartPie,
 } from "react-icons/hi";
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { signoutSuccess } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function DashSidebar() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+  const navigate = useNavigate();
 
   const location = useLocation();
   const [tab, setTab] = useState("");
@@ -26,6 +27,19 @@ export default function DashSidebar() {
     }
   }, [location.search]);
 
+  const whichUser = () => {
+    if (currentUser.role === "admin") {
+      return "Admin";
+    } else if (currentUser.role === "manager") {
+      return "Manager";
+    } else {
+      if (currentUser.role === "guide") {
+        return "Guide";
+      } else {
+        return "User";
+      }
+    }
+  };
   const handleSignout = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/user/logout`, {
@@ -36,6 +50,7 @@ export default function DashSidebar() {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());
+        navigate("/login");
       }
     } catch (error) {
       console.log(error.message);
@@ -58,12 +73,24 @@ export default function DashSidebar() {
               </Sidebar.Item>
             </Link>
           )}
+          {currentUser && currentUser.role == "manager" && (
+            <Link to="/dashboard?tab=manager">
+              <Sidebar.Item
+                active={tab === "manager" || !tab}
+                icon={HiChartPie}
+                as="div"
+                className="hover:bg-gray-400"
+              >
+                Dashboard
+              </Sidebar.Item>
+            </Link>
+          )}
 
           <Link to="/dashboard?tab=profile">
             <Sidebar.Item
               active={tab === "profile"}
               icon={HiUser}
-              label={currentUser.role ? "Admin" : "User"}
+              label={whichUser()}
               labelColor="dark"
               as="div"
               className="hover:bg-gray-400"

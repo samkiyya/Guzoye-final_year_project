@@ -34,14 +34,14 @@ const Header = () => {
   const handleSignout = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/user/logout`, {
-        method: "POST"
+        method: "POST",
       });
       const data = await res.json();
       if (res.status !== 200) {
         console.log(data.message);
       } else {
         dispatch(signoutSuccess());
-        navigate("/");
+        navigate("/login");
       }
     } catch (error) {
       console.log(error.message);
@@ -49,9 +49,9 @@ const Header = () => {
   };
 
   const openMenu = () => {
-    document.getElementById('mobileNav').classList.add('visible');
+    document.getElementById("mobileNav").classList.add("visible");
     document.getElementById("mobileNav").classList.remove("hidden");
-  }
+  };
 
   const closeMenu = () => {
     document.getElementById("mobileNav").classList.add("hidden");
@@ -111,29 +111,41 @@ const Header = () => {
                   {currentUser.email}
                 </span>
               </Dropdown.Header>
-              <Link to="/profile/user">
+              <Link to="/dashboard?tab=profile">
                 <Dropdown.Item>Profile</Dropdown.Item>
               </Link>
-              <Link to="/my-bookings">
+              <Link to="/dashboard?tab=profile?panelId=1">
                 <Dropdown.Item>My Bookings</Dropdown.Item>
               </Link>
-              <Link to="/my-history">
-                <Dropdown.Item>My History</Dropdown.Item>
+              <Link to="/schedule">
+                <Dropdown.Item>My Schedule</Dropdown.Item>
               </Link>
-              <Link to="/update-profile">
+              {currentUser.role === "guide" && (
+                <Link to="/quiz">
+                  <Dropdown.Item>Take a quiz</Dropdown.Item>
+                </Link>
+              )}
+              <Link to="/dashboard?tab=profile?panelId=2">
                 <Dropdown.Item>Update Profile</Dropdown.Item>
+              </Link>
+              <Link to="/dashboard?tab=profile?panelId=3">
+                <Dropdown.Item>My History</Dropdown.Item>
               </Link>
               <Dropdown.Divider />
               <Dropdown.Item onClick={handleSignout}>Sign out</Dropdown.Item>
             </Dropdown>
           ) : (
             <>
-              <Button gradientDuoTone="purpleToBlue" className="text-black">
-                <Link to="/login">Sign In</Link>
-              </Button>
-              <Button gradientDuoTone="purpleToBlue" className="text-black">
-                <Link to="/register">Register</Link>
-              </Button>
+              <Link to="/login">
+                <Button gradientDuoTone="purpleToBlue" className="text-black">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button gradientDuoTone="purpleToBlue" className="text-black">
+                  Register
+                </Button>
+              </Link>
             </>
           )}
         </div>
@@ -184,7 +196,10 @@ const Header = () => {
               label={
                 <div className="w-48 border-b-2 border-gray-700 text-left text-black font-semibold flex flex-row justify-between">
                   <p className="e">My profile</p>
-                  <img src="./icons/expandArrow.png" className="w-5 h-5 self-center" />
+                  <img
+                    src="./icons/expandArrow.png"
+                    className="w-5 h-5 self-center"
+                  />
                 </div>
               }
               className="px-5 py-1 bg-green-400 dark:bg-green-500 border-none"
