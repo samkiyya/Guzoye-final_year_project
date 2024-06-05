@@ -7,14 +7,15 @@ import {
   logout,
   register,
 } from "../controllers/authController";
+const validate = require("../middleware/validate");
 
 const router = express.Router();
 
 //registration route
-router.post("/register", register);
+router.post("/register", validate, register);
 
 //login route
-router.post("/login", login);
+router.post("/login", validate, login);
 
 //login route using google auth
 router.post("/google", googleAuth);
@@ -25,6 +26,6 @@ router.get("/validate-token", verifyToken, (req: Request, res: Response) => {
 });
 
 //logout route
-router.post("/logout", verifyToken, logout);
+router.post("/logout", logout);
 
 export default router;

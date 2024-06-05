@@ -69,30 +69,25 @@ export const register = async (
     await newUser.save();
 
     const token = jwt.sign(
-      { userId: newUser._id },
+      { userId: newUser._id, userRole: newUser.role },
       process.env.JWT_SECRET_KEY as string,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60,
+      maxAge: 1000 * 60 * 60 * 24,
     });
 
-    res.status(201).json({ message: "User created successfully" });
+    res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Something went wrong, please try again" });
-    next(err);
   }
 };
 
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const login = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -100,7 +95,7 @@ export const login = async (
 
   const { username, email, password } = req.body;
 
-  if (!username || !email || !password) {
+  if (!email || !password) {
     return res
       .status(400)
       .json({ success: false, message: "Please fill all the required fields" });
@@ -112,7 +107,7 @@ export const login = async (
     if (!validUser) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "Incorrect email or password",
       });
     }
 
@@ -127,13 +122,13 @@ export const login = async (
     const token = jwt.sign(
       { userId: validUser.id, userRole: validUser.role },
       process.env.JWT_SECRET_KEY as string,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60,
+      maxAge: 1000 * 60 * 60 * 24,
     });
 
     res.status(200).json({
@@ -147,7 +142,6 @@ export const login = async (
       success: false,
       message: "Something went wrong, please try to login again",
     });
-    next(err);
   }
 };
 
@@ -201,13 +195,13 @@ export const googleAuth = async (
     const token = jwt.sign(
       { userId: newUser._id, userRole: newUser.role },
       process.env.JWT_SECRET_KEY as string,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60,
+      maxAge: 1000 * 60 * 60 * 24,
     });
 
     res.status(201).json({ message: "User created successfully" });
@@ -220,22 +214,15 @@ export const googleAuth = async (
   }
 };
 
-export const logout = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const logout = async (req: Request, res: Response) => {
   try {
-    res.clearCookie("auth_token").status(200).json({
-      success: true,
-      message: "Logged out successfully",
-    });
+    res.cookie("auth_token", "", { maxAge: 1 });
+    res.status(201).json("Logged out successfully");
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.status(500).json({
       success: false,
-      message: "Something went wrong, please try to logout again",
+      err: "Server Error",
     });
-    next(err);
   }
 };

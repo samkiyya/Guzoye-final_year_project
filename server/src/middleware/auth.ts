@@ -6,6 +6,7 @@ declare global {
   namespace Express {
     interface Request {
       userId: string;
+      userRole: string;
     }
   }
 }
@@ -29,6 +30,7 @@ export const verifyToken = (
       process.env.JWT_SECRET_KEY as string
     ) as JwtPayload;
     req.userId = decoded.userId;
+    req.userRole = decoded.userRole;
     next();
   } catch (error) {
     console.error("Token verification failed:", error);

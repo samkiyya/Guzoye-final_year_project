@@ -7,7 +7,10 @@ import { signInSuccess } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
 
 export default function OAuth() {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+  const API_BASE_URL =
+    import.meta.env.NODE_ENV === "production"
+      ? "https://guzoye.onrender.com"
+      : import.meta.env.VITE_API_BASE_URL || "";
 
   const auth = getAuth(app);
   const dispatch = useDispatch();
