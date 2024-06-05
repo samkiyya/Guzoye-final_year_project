@@ -35,7 +35,7 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="footer">
+    <footer className="footer z-10">
       <Container>
         <Row>
           <Col lg="3">
