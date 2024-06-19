@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import { check } from "express-validator";
 import { verifyToken } from "../middleware/auth";
 import {
   googleAuth,
@@ -7,7 +6,7 @@ import {
   logout,
   register,
 } from "../controllers/authController";
-const validate = require("../middleware/validate");
+import { validate } from "../middleware/validate";
 
 const router = express.Router();
 
