@@ -2,36 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const ActionProvider = ({ createChatBotMessage, setState, children }) => {
-  const handleGreet = () => {
-    const message = createChatBotMessage("Hello! How can I assist you today?");
-    setState((state) => ({ ...state, messages: [...state.messages, message] }));
-  };
-
-  const handleHelp = () => {
-    const message = createChatBotMessage(
-      "Here are some things I can assist you with: booking a package, checking your itinerary, providing travel tips, or answering general questions about your trip. What do you need help with?"
-    );
-    setState((state) => ({ ...state, messages: [...state.messages, message] }));
-  };
-
-  const handleBooking = () => {
-    const message = createChatBotMessage(
-      "Sure! I can help you book a package. Please provide the package ID and your travel dates."
-    );
-    setState((state) => ({ ...state, messages: [...state.messages, message] }));
-  };
-
-  const handleItinerary = () => {
-    const message = createChatBotMessage(
-      "I can help you check your itinerary. Please provide your booking reference number."
-    );
-    setState((state) => ({ ...state, messages: [...state.messages, message] }));
-  };
-
-  const handleTravelTips = () => {
-    const message = createChatBotMessage(
-      "Here are some travel tips: 1. Always keep a copy of your passport. 2. Learn basic phrases in the local language. 3. Keep your valuables secure. Do you need tips for a specific destination?"
-    );
+  const handleCustomResponse = (response) => {
+    const message = createChatBotMessage(response);
     setState((state) => ({ ...state, messages: [...state.messages, message] }));
   };
 
@@ -42,17 +14,25 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
     setState((state) => ({ ...state, messages: [...state.messages, message] }));
   };
 
+  const handleUserName = (name) => {
+    const message = createChatBotMessage(
+      `Nice to meet you, ${name}! How can I assist you with your travel plans?`
+    );
+    setState((state) => ({
+      ...state,
+      messages: [...state.messages, message],
+      userName: name,
+    }));
+  };
+
   return (
     <div>
       {React.Children.map(children, (child) => {
         return React.cloneElement(child, {
           actions: {
-            handleGreet,
-            handleHelp,
-            handleBooking,
-            handleItinerary,
-            handleTravelTips,
+            handleCustomResponse,
             handleGeneralQuery,
+            handleUserName,
           },
         });
       })}

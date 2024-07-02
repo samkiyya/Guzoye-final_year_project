@@ -1,0 +1,113 @@
+{
+  "greetings": {
+    "keywords": ["hello", "hi", "hey", "how are you"],
+    "response": "Hello! Welcome to Guzoye Travel. How can I assist you today?"
+  },
+  "goodbyes": {
+    "keywords": ["bye", "goodbye", "see you"],
+    "response": "Goodbye! Have a great day and enjoy your travels!"
+  },
+  "tourBooking": {
+    "keywords": ["book", "tour", "reservation"],
+    "response": "Sure! Which Ethiopian destination or cultural event would you like to book a tour for?"
+  },
+  "destinations": {
+    "keywords": [
+      "lalibela",
+      "axum",
+      "gondar",
+      "simien mountains",
+      "bahir dar",
+      "lake tana",
+      "awash national park",
+      "harar",
+      "rift valley",
+      "omo valley",
+      "addis ababa",
+      "sofri orgaya",
+      "tana monasteries"
+    ],
+    "responses": {
+      "lalibela": "Lalibela is famous for its rock-hewn churches. Would you like to book a tour there?",
+      "axum": "Axum is known for its ancient ruins and the Ark of the Covenant. Interested in a tour?",
+      "gondar": "Gondar is home to the Fasil Ghebbi fortress and beautiful churches. Shall we arrange a visit?",
+      "simien mountains": "The Simien Mountains offer breathtaking views and wildlife. Ready to explore?",
+      "bahir dar": "Bahir Dar is known for its monasteries on Lake Tana. Want to book a visit?",
+      "lake tana": "Lake Tana is the largest lake in Ethiopia, with beautiful islands and monasteries. Interested in a tour?",
+      "awash national park": "Awash National Park is rich in wildlife and natural beauty. Shall we arrange a visit?",
+      "harar": "Harar is a historic city with unique architecture and culture. Would you like to visit?",
+      "rift valley": "The Ethiopian Rift Valley is known for its stunning landscapes and lakes. Interested in exploring?",
+      "omo valley": "Omo Valley is famous for its diverse cultures and tribes. Want to book a cultural tour?",
+      "addis ababa": "Addis Ababa is the capital city of Ethiopia with many attractions like the National Museum. Interested in a city tour?",
+      "sofri orgaya": "Sofri Orgaya is a significant archaeological site. Would you like to explore it?",
+      "tana monasteries": "The monasteries on Lake Tana offer a glimpse into ancient religious practices. Want to visit?"
+    }
+  },
+  "culturalEvents": {
+    "keywords": ["timket", "meskel", "genna", "fasika", "eid", "buhe"],
+    "responses": {
+      "timket": "Timket is the Ethiopian Orthodox celebration of Epiphany. It's a vibrant and colorful festival. Would you like to experience it?",
+      "meskel": "Meskel commemorates the discovery of the True Cross. It's celebrated with large bonfires and religious ceremonies. Interested?",
+      "genna": "Genna is the Ethiopian Orthodox Christmas, celebrated with unique traditions. Would you like to learn more?",
+      "fasika": "Fasika is the Ethiopian Orthodox Easter, marked by special church services and feasts. Would you like to participate?",
+      "eid": "Eid al-Fitr and Eid al-Adha are significant Islamic holidays celebrated in Ethiopia with communal prayers and feasts. Interested in learning more?",
+      "buhe": "Buhe is a festival where children sing door to door and receive fresh bread. Would you like to know more about it?"
+    }
+  },
+  "unescoSites": {
+    "keywords": [
+      "unesco",
+      "world heritage",
+      "heritage",
+      "lalibela",
+      "axum",
+      "simien mountains",
+      "harar",
+      "konso",
+      "lower omo valley",
+      "lower awash valley",
+      "tana monasteries"
+    ],
+    "responses": {
+      "lalibela": "The Rock-Hewn Churches of Lalibela are a UNESCO World Heritage site. Would you like to book a tour there?",
+      "axum": "The ruins of Axum, including the obelisks and the supposed Ark of the Covenant, are a UNESCO site. Interested in a visit?",
+      "simien mountains": "The Simien Mountains National Park is a UNESCO site known for its unique wildlife and landscapes. Ready to explore?",
+      "harar": "Harar Jugol, the Old Walled City, is a UNESCO site known for its historic significance. Would you like to visit?",
+      "konso": "The Konso Cultural Landscape is a UNESCO site known for its terraced fields and unique traditions. Interested in a tour?",
+      "lower omo valley": "The Lower Valley of the Omo is a UNESCO site rich in archaeological findings. Want to explore it?",
+      "lower awash valley": "The Lower Valley of the Awash is a UNESCO site known for early hominid fossils. Would you like to learn more?",
+      "tana monasteries": "The monasteries on the islands of Lake Tana are part of a UNESCO site. Want to visit?"
+    }
+  },
+  "generalInquiries": {
+    "keywords": [
+      "ethiopia",
+      "tourism",
+      "destinations",
+      "places",
+      "info",
+      "information"
+    ],
+    "response": "Ethiopia offers a variety of beautiful and historic destinations. How can I help you with your travel plans?"
+  },
+  "accommodation": {
+    "keywords": ["hotel", "accommodation", "stay", "room"],
+    "response": "Would you like help finding accommodation in any particular Ethiopian city or destination?"
+  },
+  "transportation": {
+    "keywords": ["transport", "car rental", "bus", "flight"],
+    "response": "We can assist with transportation arrangements. Are you looking for car rentals, bus services, or flights?"
+  },
+  "travelTips": {
+    "keywords": ["tips", "advice", "help"],
+    "response": "Traveling to Ethiopia can be an enriching experience. Would you like some travel tips or advice?"
+  },
+  "culture": {
+    "keywords": ["culture", "traditions", "customs"],
+    "response": "Ethiopia is rich in culture and traditions. Would you like to learn more about Ethiopian customs?"
+  },
+  "cuisine": {
+    "keywords": ["food", "cuisine", "restaurant", "dining"],
+    "response": "Ethiopian cuisine is known for its delicious dishes like injera and doro wat. Looking for dining recommendations?"
+  }
+}

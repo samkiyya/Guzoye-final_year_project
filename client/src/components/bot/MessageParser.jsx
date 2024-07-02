@@ -1,24 +1,33 @@
 import React from "react";
 import PropTypes from "prop-types";
+import chatbotConfig from "./responseConfig.json";
 
 const MessageParser = ({ children, actions }) => {
   const parse = (message) => {
     const lowerCaseMessage = message.toLowerCase();
+    let matched = false;
 
-    if (lowerCaseMessage.includes("hello") || lowerCaseMessage.includes("hi")) {
-      actions.handleGreet();
-    } else if (lowerCaseMessage.includes("help")) {
-      actions.handleHelp();
-    } else if (
-      lowerCaseMessage.includes("book") ||
-      lowerCaseMessage.includes("booking")
-    ) {
-      actions.handleBooking();
-    } else if (lowerCaseMessage.includes("itinerary")) {
-      actions.handleItinerary();
-    } else if (lowerCaseMessage.includes("travel tips")) {
-      actions.handleTravelTips();
-    } else {
+    for (const [category, { keywords, response, responses }] of Object.entries(
+      chatbotConfig
+    )) {
+      if (keywords.some((keyword) => lowerCaseMessage.includes(keyword))) {
+        if (responses) {
+          for (const [key, resp] of Object.entries(responses)) {
+            if (lowerCaseMessage.includes(key)) {
+              actions.handleCustomResponse(resp);
+              matched = true;
+              break;
+            }
+          }
+        } else {
+          actions.handleCustomResponse(response);
+          matched = true;
+        }
+        if (matched) break;
+      }
+    }
+
+    if (!matched) {
       actions.handleGeneralQuery();
     }
   };
@@ -37,7 +46,6 @@ const MessageParser = ({ children, actions }) => {
 MessageParser.propTypes = {
   children: PropTypes.node.isRequired,
   actions: PropTypes.object.isRequired,
-  setState: PropTypes.func.isRequired,
 };
 
 export default MessageParser;

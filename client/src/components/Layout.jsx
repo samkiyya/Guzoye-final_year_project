@@ -1,12 +1,15 @@
-import Header from "./../Header/Header";
-import Routers from "../../router/Routers";
-import Footer from "./../Footer/Footer";
+import Header from "./Header";
+import Routers from "./../router/Routers";
+import GuzoyeBot from "../pages/user/GuzoyeBot";
+
+import Footer from "./Footer/Footer";
 
 const Layout = () => {
   return (
     <>
       <Header />
       <Routers />
+      <GuzoyeBot />
       <Footer />
     </>
   );

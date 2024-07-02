@@ -1,5 +1,6 @@
 import { createChatBotMessage } from "react-chatbot-kit";
 import BotAvatar from "./BotAvatar";
+import UserAvatar from "./UserAvatar";
 
 const botName = "GuzoyeBot";
 
@@ -10,6 +11,7 @@ const config = {
   botName: botName,
   customComponents: {
     botAvatar: (props) => <BotAvatar {...props} />,
+    userAvatar: (props) => <UserAvatar {...props} />,
   },
   customStyles: {
     botMessageBox: {
