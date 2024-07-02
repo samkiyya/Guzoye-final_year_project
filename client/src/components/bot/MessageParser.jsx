@@ -7,7 +7,7 @@ const MessageParser = ({ children, actions }) => {
     const lowerCaseMessage = message.toLowerCase();
     let matched = false;
 
-    for (const [category, { keywords, response, responses }] of Object.entries(
+    for (const [, { keywords, response, responses }] of Object.entries(
       chatbotConfig
     )) {
       if (keywords.some((keyword) => lowerCaseMessage.includes(keyword))) {
