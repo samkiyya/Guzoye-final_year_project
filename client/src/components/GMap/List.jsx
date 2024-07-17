@@ -35,7 +35,9 @@ const List = ({
 
   return (
     <Box sx={{ padding: "25px" }}>
-      <Typography variant="h4">Food & Dining around you</Typography>
+      <Typography variant="h5">
+        Resturants, Hotels, and Attractions around you
+      </Typography>
       {isLoading ? (
         <Box
           sx={{
