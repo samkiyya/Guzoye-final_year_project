@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  currentUser: null,
+  currentUser: localStorage.getItem("currentUser")
+    ? JSON.parse(localStorage.getItem("currentUser"))
+    : null,
   error: null,
   loading: false,
 };
@@ -10,52 +12,17 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    signInStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    signInSuccess: (state, action) => {
-      state.currentUser = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    signInFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    signoutStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    signoutSuccess: (state) => {
-      state.currentUser = null;
-      state.error = null;
-      state.loading = false;
-    },
-    signoutFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
     updateStart: (state) => {
       state.loading = true;
       state.error = null;
     },
     updateSuccess: (state, action) => {
       state.currentUser = action.payload;
+      localStorage.setItem("currentUser", JSON.stringify(action.payload));
       state.loading = false;
       state.error = null;
     },
     updateFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    updatePassStart: (state) => {
-      state.loading = true;
-    },
-    updatePassSuccess: (state) => {
-      state.loading = false;
-    },
-    updatePassFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
@@ -65,6 +32,7 @@ const userSlice = createSlice({
     },
     deleteUserSuccess: (state) => {
       state.currentUser = null;
+      localStorage.removeItem("currentUser");
       state.loading = false;
       state.error = null;
     },
@@ -76,18 +44,9 @@ const userSlice = createSlice({
 });
 
 export const {
-  signInStart,
-  signInSuccess,
-  signInFailure,
-  signoutStart,
-  signoutSuccess,
-  signoutFailure,
   updateStart,
   updateSuccess,
   updateFailure,
-  updatePassStart,
-  updatePassSuccess,
-  updatePassFailure,
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,

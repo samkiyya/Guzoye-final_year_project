@@ -2,8 +2,9 @@ import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { signoutSuccess } from "../redux/user/userSlice";
+import { signoutSuccess } from "../redux/auth/authSlice";
 import { toggleTheme } from "../redux/theme/themeSlice";
+import { useState } from "react"; // Import useState for managing menu state
 
 const nav__links = [
   {
@@ -22,14 +23,21 @@ const nav__links = [
     path: "/packages",
     display: "Packages",
   },
+  {
+    path: "/contact-us",
+    display: "Contact Us",
+  },
 ];
 
 const Header = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
   const navigate = useNavigate();
-  const { currentUser } = useSelector((state) => state.user);
+  const currentUser = useSelector((state) => state.auth.currentUser);
   const dispatch = useDispatch();
   const { theme } = useSelector((state) => state.theme);
+
+  // State for managing menu visibility
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleSignout = async () => {
     try {
@@ -48,14 +56,14 @@ const Header = () => {
     }
   };
 
+  // Function to open menu
   const openMenu = () => {
-    document.getElementById("mobileNav").classList.add("visible");
-    document.getElementById("mobileNav").classList.remove("hidden");
+    setIsMenuOpen(true);
   };
 
+  // Function to close menu
   const closeMenu = () => {
-    document.getElementById("mobileNav").classList.add("hidden");
-    document.getElementById("mobileNav").classList.remove("visible");
+    setIsMenuOpen(false);
   };
 
   return (
@@ -91,6 +99,7 @@ const Header = () => {
           </Button>
           <img
             src="./icons/menu.png"
+            alt="Menu"
             className="self-center w-7 h-7 hover:cursor-pointer sm:hidden"
             onClick={openMenu}
           />
@@ -114,7 +123,7 @@ const Header = () => {
               <Link to="/dashboard?tab=profile">
                 <Dropdown.Item>Profile</Dropdown.Item>
               </Link>
-              <Link to="/dashboard?tab=profile?panelId=1">
+              <Link to="/dashboard?tab=profile&panelId=1">
                 <Dropdown.Item>My Bookings</Dropdown.Item>
               </Link>
               <Link to="/schedule">
@@ -125,10 +134,10 @@ const Header = () => {
                   <Dropdown.Item>Take a quiz</Dropdown.Item>
                 </Link>
               )}
-              <Link to="/dashboard?tab=profile?panelId=2">
+              <Link to="/dashboard?tab=profile&panelId=2">
                 <Dropdown.Item>Update Profile</Dropdown.Item>
               </Link>
-              <Link to="/dashboard?tab=profile?panelId=3">
+              <Link to="/dashboard?tab=profile&panelId=3">
                 <Dropdown.Item>My History</Dropdown.Item>
               </Link>
               <Dropdown.Divider />
@@ -152,7 +161,9 @@ const Header = () => {
       </Navbar>
       <div
         id="mobileNav"
-        className="z-40 flex flex-col w-full h-full py-16 absolute top-0 left-0 bg-green-400 dark:bg-green-500 sm:hidden"
+        className={`z-40 flex flex-col w-full h-full py-16 absolute top-0 left-0 bg-green-400 dark:bg-green-500 sm:hidden ${
+          isMenuOpen ? "visible" : "hidden"
+        }`}
       >
         <Link
           to="/"
@@ -165,14 +176,15 @@ const Header = () => {
           to="/"
           className="absolute top-5 right-20 whitespace-nowrap text-black text-sm font-semibold"
           onClick={() => {
-            closeMenu;
-            handleSignout;
+            closeMenu();
+            handleSignout();
           }}
         >
           Logout
         </Link>
         <img
           src="./icons/closeButton.png"
+          alt="Close"
           className="absolute w-8 h-8 top-3 right-8 hover:cursor-pointer"
           onClick={closeMenu}
         />
@@ -198,6 +210,7 @@ const Header = () => {
                   <p className="e">My profile</p>
                   <img
                     src="./icons/expandArrow.png"
+                    alt="Expand"
                     className="w-5 h-5 self-center"
                   />
                 </div>
@@ -248,4 +261,5 @@ const Header = () => {
     </>
   );
 };
+
 export default Header;

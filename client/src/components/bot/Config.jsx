@@ -2,7 +2,7 @@ import { createChatBotMessage } from "react-chatbot-kit";
 import BotAvatar from "./BotAvatar";
 import UserAvatar from "./UserAvatar";
 
-const botName = "GuzoyeBot";
+const botName = "ጉZOዬ";
 
 const config = {
   initialMessages: [

@@ -7,7 +7,7 @@ import {
 } from "react-icons/hi";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { signoutSuccess } from "../redux/user/userSlice";
+import { signoutSuccess } from "../redux/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function DashSidebar() {

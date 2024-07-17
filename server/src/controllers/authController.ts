@@ -111,7 +111,7 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    const isMatch = await bcrypt.compare(password, validUser.password);
+    const isMatch = await bcrypt.compare(req.body.password, validUser.password);
 
     if (!isMatch) {
       return res
@@ -159,13 +159,13 @@ export const googleAuth = async (
       const token = jwt.sign(
         { userId: user.id, userRole: user.role },
         process.env.JWT_SECRET_KEY as string,
-        { expiresIn: "1h" }
+        { expiresIn: "1d" }
       );
 
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 1000 * 60 * 60,
+        maxAge: 1000 * 60 * 60 * 24,
       });
 
       return res.status(200).json({
@@ -216,7 +216,7 @@ export const googleAuth = async (
 
 export const logout = async (req: Request, res: Response) => {
   try {
-    res.cookie("auth_token", "", { maxAge: 1 });
+    res.cookie("auth_token", "", { maxAge: 0 });
     res.status(201).json("Logged out successfully");
   } catch (err) {
     console.log(err);

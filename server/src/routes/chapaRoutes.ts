@@ -1,9 +1,10 @@
 // routes/chapaRoutes.ts
 import express from "express";
-import { initializePayment } from "../controllers/chapaPayment";
+import { initializePayment, handleCallback } from "../controllers/chapaPayment";
 
 const router = express.Router();
 
-router.post("/initialize-payment", initializePayment);
+router.post("/chapa", initializePayment);
+router.post("/callback", handleCallback);
 
 export default router;

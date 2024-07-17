@@ -1,34 +1,90 @@
 import { Request, Response } from "express";
 import Booking from "../models/booking";
-import Package from "../models/package";
+import Package, { PackageType } from "../models/package";
 import { ObjectId } from "mongodb";
 
-// create new booking
-export const bookPackage = async (req: Request, res: Response) => {
+// Utility Function
+function calcPrices(travels: any) {
+  const travelsPrice = travels.reduce(
+    (acc: any, item: any): any => acc + item.packagePrice * item.qty,
+    0
+  );
+  const taxRate = 0.15;
+  const taxPrice = (travelsPrice * taxRate).toFixed(2);
+  const totalPrice = (travelsPrice + parseFloat(taxPrice)).toFixed(2);
+
+  return {
+    travelsPrice: travelsPrice.toFixed(2),
+    taxPrice,
+    totalPrice,
+  };
+}
+
+// Create new booking
+const bookPackage = async (req: Request, res: Response) => {
   try {
-    const { packageDetails, buyer, totalPrice, guestSize, date } = req.body;
-    if (req.userId !== buyer) {
+    const { BookingTravels, travelerAddress, paymentMethod, user, guestSize } =
+      req.body;
+
+    if (req.userId !== user) {
       return res.status(401).send({
         success: false,
-        message: "You can only buy on your account!",
-      });
-    }
-    if (!packageDetails || !buyer || !totalPrice || !guestSize || !date) {
-      return res.status(200).send({
-        success: false,
-        message: "All fields are required!",
-      });
-    }
-    const validPackage = await Package.findById(packageDetails);
-    if (!validPackage) {
-      return res.status(404).send({
-        success: false,
-        message: "Package Not Found!",
+        message: "You can only book with your own account!",
       });
     }
 
-    const newBooking = await Booking.create(req.body);
-    if (newBooking) {
+    if (BookingTravels && BookingTravels.length === 0) {
+      return res.status(400).send({
+        success: false,
+        message: "There are no booked travels",
+      });
+    }
+
+    const packageIds = BookingTravels.map((x: any) => x._id);
+    const validPackages = (await Package.find({
+      _id: { $in: packageIds },
+    })) as (PackageType & { _id: ObjectId })[];
+
+    if (validPackages.length !== BookingTravels.length) {
+      return res.status(404).send({
+        success: false,
+        message: "One or more packages not found!",
+      });
+    }
+
+    const dbOrderItems = BookingTravels.map((itemFromClient: any) => {
+      const matchingItemFromDB = validPackages.find(
+        (packageItem: any) => packageItem._id.toString() === itemFromClient._id
+      );
+
+      if (!matchingItemFromDB) {
+        throw new Error(`Package not found: ${itemFromClient._id}`);
+      }
+
+      return {
+        ...itemFromClient,
+        product: itemFromClient._id,
+        packagePrice: matchingItemFromDB.packagePrice, // Ensure this line is accessing the 'packagePrice' field
+        _id: undefined,
+      };
+    });
+
+    const { travelsPrice, taxPrice, totalPrice } = calcPrices(dbOrderItems);
+
+    const newBooking = new Booking({
+      BookingTravels: dbOrderItems,
+      user: req.userId,
+      travelerAddress,
+      paymentMethod,
+      travelsPrice,
+      taxPrice,
+      totalPrice,
+      guestSize,
+    });
+
+    const createBook = await newBooking.save();
+
+    if (createBook) {
       return res.status(201).send({
         success: true,
         message: "Your tour is booked!",
@@ -40,72 +96,76 @@ export const bookPackage = async (req: Request, res: Response) => {
       });
     }
   } catch (error) {
+    console.error("Error creating booking:", error);
     res.status(500).json({ success: false, message: "Internal server error!" });
-    console.log(error);
   }
 };
 
-//get current bookings for Manager
-export const getCurrentBookings = async (req: Request, res: Response) => {
+// Count total orders
+const countTotalOrders = async (req: Request, res: Response) => {
   try {
-    const searchTerm = req?.query?.searchTerm || "";
-    const bookings = await Booking.find({
-      date: { $gt: new Date().toISOString() },
-      status: "Booked",
-    })
-      .populate("packageDetails")
-      // .populate("buyer", "username email")
-      .populate({
-        path: "buyer",
-        match: {
-          $or: [
-            { username: { $regex: searchTerm, $options: "i" } },
-            { email: { $regex: searchTerm, $options: "i" } },
-          ],
-        },
-      })
-      .sort({ createdAt: "asc" });
-    let bookingsFilterd: any = [];
-    bookings.map((booking) => {
-      if (booking.buyer !== null) {
-        bookingsFilterd.push(booking);
-      }
-    });
-    if (bookingsFilterd.length) {
-      return res.status(200).send({
-        success: true,
-        bookings: bookingsFilterd,
-      });
-    } else {
-      return res.status(200).send({
-        success: false,
-        message: "No Bookings Available",
-      });
-    }
-  } catch (error) {
-    console.log(error);
+    const totalOrders = await Booking.countDocuments();
+    res.json({ success: true, totalOrders });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-//get current bookings for user by id
-export const getUserCurrentBookings = async (req: Request, res: Response) => {
-  const id = req.params.id;
+// Calculate total sales
+const calculateTotalSales = async (req: Request, res: Response) => {
+  try {
+    const orders = await Booking.find();
+    const totalSales = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+    res.json({ success: true, totalSales });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Calculate total sales by date
+const calculateTotalSalesByDate = async (req: Request, res: Response) => {
+  try {
+    const salesByDate = await Booking.aggregate([
+      {
+        $match: {
+          isPaid: true,
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$paidAt" },
+          },
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+    ]);
+
+    res.json({ success: true, salesByDate });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Get current bookings for user by ID
+const getUserCurrentBookings = async (req: Request, res: Response) => {
+  const { id } = req.params;
 
   try {
     if (req.userId !== id) {
       return res.status(401).send({
         success: false,
-        message: "You can only get your own bookings!!",
+        message: "You can only get your own bookings!",
       });
     }
-    const searchTerm = req?.query?.searchTerm || "";
+
+    const searchTerm = req.query.searchTerm || "";
 
     const bookings = await Booking.find({
-      buyer: new ObjectId(req?.params?.id),
+      buyer: new ObjectId(id),
       date: { $gt: new Date().toISOString() },
       status: "Booked",
     })
-      // .populate("packageDetails")
       .populate({
         path: "packageDetails",
         match: {
@@ -114,38 +174,37 @@ export const getUserCurrentBookings = async (req: Request, res: Response) => {
       })
       .populate("buyer", "username email")
       .sort({ createdAt: "asc" });
-    let bookingsFilterd: any = [];
-    bookings.map((booking) => {
-      if (booking.packageDetails !== null) {
-        bookingsFilterd.push(booking);
-      }
-    });
-    if (bookingsFilterd.length) {
+
+    const filteredBookings = bookings.filter(
+      (booking) => booking.BookingTravels !== null
+    );
+
+    if (filteredBookings.length) {
       return res.status(200).send({
         success: true,
-        bookings: bookingsFilterd,
+        bookings: filteredBookings,
       });
     } else {
       return res.status(200).send({
         success: false,
-        message: "No Bookings Available",
+        message: "No bookings available",
       });
     }
   } catch (error) {
-    res.status(404).json({ success: true, message: "Not Found!" });
-    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error!" });
+    console.error(error);
   }
 };
 
-// get all booking
-export const getAllBookings = async (req: Request, res: Response) => {
+// Get all bookings
+const getAllBookings = async (req: Request, res: Response) => {
   try {
-    const searchTerm = req?.query?.searchTerm || "";
+    const searchTerm = req.query.searchTerm || "";
+
     const bookings = await Booking.find({})
-      .populate("packageDetails")
-      // .populate("buyer", "username email")
+      .populate("BookingTravels")
       .populate({
-        path: "buyer",
+        path: "user",
         match: {
           $or: [
             { username: { $regex: searchTerm, $options: "i" } },
@@ -154,45 +213,45 @@ export const getAllBookings = async (req: Request, res: Response) => {
         },
       })
       .sort({ createdAt: "asc" });
-    let bookingsFilterd: any = [];
-    bookings.map((booking) => {
-      if (booking.buyer !== null) {
-        bookingsFilterd.push(booking);
-      }
-    });
-    if (bookingsFilterd.length) {
+
+    const filteredBookings = bookings.filter(
+      (booking) => booking.user !== null
+    );
+
+    if (filteredBookings.length) {
       return res.status(200).send({
         success: true,
-        bookings: bookingsFilterd,
+        bookings: filteredBookings,
       });
     } else {
       return res.status(200).send({
         success: false,
-        message: "No Bookings Available",
+        message: "No bookings available",
       });
     }
-  } catch (error) {
-    res.status(500).json({ success: true, message: "Internal server error!" });
-    console.log(error);
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: "Internal server error!" });
+    console.error(error.message);
   }
 };
 
-//get all bookings by user id
-export const getAllUserBookings = async (req: Request, res: Response) => {
+// Get all bookings by user ID
+const getAllUserBookings = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
+
     if (req.userId !== id) {
       return res.status(401).send({
         success: false,
-        message: "You can only get your own bookings!!",
+        message: "You can only get your own bookings!",
       });
     }
 
-    const searchTerm = req?.query?.searchTerm || "";
+    const searchTerm = req.query.searchTerm || "";
+
     const bookings = await Booking.find({
-      buyer: new ObjectId(req?.params?.id),
+      buyer: new ObjectId(id),
     })
-      // .populate("packageDetails")
       .populate({
         path: "packageDetails",
         match: {
@@ -201,32 +260,56 @@ export const getAllUserBookings = async (req: Request, res: Response) => {
       })
       .populate("buyer", "username email")
       .sort({ createdAt: "asc" });
-    let bookingsFilterd: any = [];
-    bookings.map((booking) => {
-      if (booking.packageDetails !== null) {
-        bookingsFilterd.push(booking);
-      }
-    });
-    if (bookingsFilterd.length) {
+
+    const filteredBookings = bookings.filter(
+      (booking) => booking.BookingTravels !== null
+    );
+
+    if (filteredBookings.length) {
       return res.status(200).send({
         success: true,
-        bookings: bookingsFilterd,
+        bookings: filteredBookings,
       });
     } else {
       return res.status(200).send({
         success: false,
-        message: "No Bookings Available",
+        message: "No bookings available",
       });
     }
   } catch (error) {
-    res.status(500).json({ success: true, message: "Internal server error!" });
-    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error!" });
+    console.error(error);
   }
 };
 
-//delete booking history
-export const deleteBookingHistory = async (req: Request, res: Response) => {
-  const id = req.params.id;
+// Mark order as paid
+const markOrderAsPaid = async (req: Request, res: Response) => {
+  try {
+    const order = await Booking.findById(req.params.id);
+
+    if (order) {
+      order.isPaid = true;
+      order.paidAt = new Date(Date.now());
+      order.paymentResult = {
+        id: req.body.id,
+        status: req.body.status,
+        update_time: req.body.update_time,
+        email_address: req.body.payer.email_address,
+      };
+
+      const updateBooking = await order.save();
+      res.status(200).json({ success: true, updateBooking });
+    } else {
+      res.status(404).json({ success: false, message: "Booking not found" });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Delete booking history
+const deleteBookingHistory = async (req: Request, res: Response) => {
+  const { id } = req.params;
   try {
     if (req.userId !== id) {
       return res.status(401).send({
@@ -238,7 +321,7 @@ export const deleteBookingHistory = async (req: Request, res: Response) => {
     if (deleteHistory) {
       return res.status(200).send({
         success: true,
-        message: "Booking History Deleted!",
+        message: "Booking history deleted!",
       });
     } else {
       return res.status(500).send({
@@ -247,14 +330,14 @@ export const deleteBookingHistory = async (req: Request, res: Response) => {
       });
     }
   } catch (error) {
-    res.status(500).json({ success: true, message: "Internal server error!" });
-    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error!" });
+    console.error(error);
   }
 };
 
-//cancel booking
-export const cancelBooking = async (req: Request, res: Response) => {
-  const id = req.params.id;
+// Cancel booking
+const cancelBooking = async (req: Request, res: Response) => {
+  const { id } = req.params;
   try {
     if (req.userId !== id) {
       return res.status(401).send({
@@ -272,7 +355,7 @@ export const cancelBooking = async (req: Request, res: Response) => {
     if (cancelBooking) {
       return res.status(200).send({
         success: true,
-        message: "Booking Cancelled!",
+        message: "Booking cancelled!",
       });
     } else {
       return res.status(500).send({
@@ -281,7 +364,20 @@ export const cancelBooking = async (req: Request, res: Response) => {
       });
     }
   } catch (error) {
-    res.status(500).json({ success: true, message: "Internal server error!" });
-    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error!" });
+    console.error(error);
   }
+};
+
+export {
+  bookPackage,
+  countTotalOrders,
+  calculateTotalSales,
+  calculateTotalSalesByDate,
+  getUserCurrentBookings,
+  getAllBookings,
+  getAllUserBookings,
+  markOrderAsPaid,
+  deleteBookingHistory,
+  cancelBooking,
 };

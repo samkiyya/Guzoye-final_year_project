@@ -1,16 +1,16 @@
 .chatbot-popup {
   position: fixed;
-  bottom: 80px;
+  bottom: 60px;
   right: 20px;
   z-index: 9999;
 }
 
 .chatbot-container {
-  height: 500px; /* Set a fixed height for the chatbot container */
+  height: 32rem;
   position: relative;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 5px solid #d4d0d0;
+  border-radius: 18px;
+  box-shadow: 50px 3px 78px rgba(0, 0, 0, 0.795);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -27,8 +27,13 @@
 }
 
 .chatbot-title {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 0 28px;
+  text-transform: uppercase;
+  text-decoration-line: overline;
+
+  text-align: center;
 }
 
 .chatbot-menu {
@@ -71,9 +76,22 @@
 
 .chatbot-body {
   flex: 1;
-  overflow-y: auto; /* Ensure the body is scrollable */
+  overflow-y: auto;
+  background: transparent;
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox */
+}
+html {
+  overflow: scroll;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* Chrome */
+}
+::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff0000;
 }
 
 .chatbot-body::-webkit-scrollbar {
@@ -136,4 +154,10 @@
 
 .react-chatbot-kit-chat-input-container button:hover {
   background-color: #2c5561;
+}
+.react-chatbot-kit-chat-header {
+  display: none;
+}
+.react-chatbot-kit-chat-container::-webkit-scrollbar {
+  display: none;
 }

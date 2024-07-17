@@ -1,43 +1,37 @@
-import aboutImg from "../assets/images/about_img.png";
-import { FaExternalLinkAlt } from "react-icons/fa";
-
 const About = () => {
   return (
-    <div className="w-full flex justify-center">
-      <div className="w-[90%] max-w-2xl rounded-xl shadow-xl p-3 flex flex-col gap-3">
-        <h1 className="text-4xl text-center font-semibold">About</h1>
-        <div className="w-max flex flex-col">
-          <img src={aboutImg} className="w-40 h-40" alt="Image" />
-          <h1 className="text-xl font-semibold text-center">ጉZOዬ</h1>
+    <div>
+      <h1 className="text-center">About Us</h1>
+      <div className="container overflow-hidden">
+        <div className="row g-4">
+          <div className="col-12 col-md-4">
+            <img className="w-100 mt-4" src="" alt="" height="450" />
+          </div>
+          <div className="col-12 col-md-4">
+            <img className="w-100" src="" alt="" height="500" />
+          </div>
+          <div className="col-12 col-md-4">
+            <img className="w-100 mt-4" src="" alt="" height="450" />
+          </div>
         </div>
-        <ul className="list-disc w-max mx-5">
-          <li className="hover:underline hover:text-blue-600 cursor-pointer">
-            <a
-              className="flex items-center gap-2"
-              href="https://github.com/samkiyya"
-              target="_blank"
-            >
-              Git-Hub <FaExternalLinkAlt />
-            </a>
-          </li>
-          <li className="hover:underline hover:text-pink-600 cursor-pointer">
-            <a
-              className="flex items-center gap-2"
-              href="https://www.instagram.com/samkiyya/"
-              target="_blank"
-            >
-              Instagram <FaExternalLinkAlt />
-            </a>
-          </li>
-        </ul>
+      </div>
+
+      <div className="container my-5 d-flex flex-column align-items-center">
+        <h2>WHO WE ARE!</h2>
+        <h3 className="w-75 text-center">
+          We’ve been creating life changing travel experiences for 18-40+ year
+          olds. Our group tours are designed to help you connect, explore, taste
+          and give back to the world, all whilst making a new crew of mates
+          along the way. So you can relax and enjoy the absolute best of every
+          destination we visit
+        </h3>
+        <h3 className="text-center blue-color mt-4">Visit us</h3>
+        <p className="">
+          <i className="blue-color fas fa-location-arrow"></i> Tupac Amaru 200 -
+          Lima
+        </p>
         <p>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quidem
-          aliquam voluptatibus odit, saepe exercitationem autem molestias
-          asperiores dolores sit corrupti molestiae ea, facere, totam
-          necessitatibus enim quod aliquid. Quisquam, dolor. aliquam
-          voluptatibus odit, saepe exercitationem autem molestias asperiores
-          dolores sit corrupti molestiae ea, facere, totam necessitatibus enim
-          quod aliquid. Quisquam, dolor.
+          <i className="blue-color fas fa-phone"></i> +51 0123456789
         </p>
       </div>
     </div>

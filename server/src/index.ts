@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
@@ -10,6 +9,7 @@ import packageRoutes from "./routes/package";
 import reviewRoutes from "./routes/review";
 import bookingRoutes from "./routes/booking";
 import chapaRoutes from "./routes/chapaRoutes";
+import connectDB from "./config/db";
 import path from "path";
 import { v2 as cloudinary } from "cloudinary";
 dotenv.config({});
@@ -27,23 +27,7 @@ const corsOptions = {
   credentials: false,
 };
 // Database connection
-const connect = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_CONNECTION_STRING as string);
-    console.log("Cloud MongoDB database connected successfully");
-  } catch (error) {
-    console.log("Failed to connect with cloud MongoDB database");
-    try {
-      await mongoose.connect(
-        process.env.LOCAL_MONGODB_CONNECTION_STRING as string
-      );
-      console.log("Local MongoDB database connected successfully");
-    } catch (error) {
-      console.log("Failed to connect with MongoDB database");
-    }
-  }
-};
-
+connectDB();
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -60,8 +44,11 @@ app.use("/api/tours", tourRoutes);
 app.use("/api/package", packageRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/booking", bookingRoutes);
-app.use("/api/chapa", chapaRoutes);
+app.use("/api/payment", chapaRoutes);
 
+// app.get("/paypal", (req:Request, res:Response) => {
+//   res.send({ clientId: process.env.CHAPA_API_KEY });
+// });
 // Serve React app for any other route
 app.get("*", (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "../../client/index.html"));
@@ -81,6 +68,5 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 // Start server
 app.listen(port, () => {
-  connect();
   console.log(`Server is running on port ${port}`);
 });

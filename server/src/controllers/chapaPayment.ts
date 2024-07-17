@@ -19,8 +19,8 @@ export const initializePayment = async (req: Request, res: Response) => {
         email: email,
         first_name: first_name,
         tx_ref: `tx-${Date.now()}`,
-        callback_url: "https://yourdomain.com/callback",
-        return_url: "https://yourdomain.com/return",
+        callback_url: "http://localhost:5000/api/payment/callback",
+        return_url: "http://localhost:5173/payment/return",
         customization: {
           title: "Booking Payment",
           description: `Payment for booking ${packageName}`,
@@ -46,4 +46,14 @@ export const initializePayment = async (req: Request, res: Response) => {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
+};
+export const handleCallback = (req: Request, res: Response) => {
+  // Handle the callback from Chapa
+  const { status, tx_ref } = req.body;
+  if (status === "success") {
+    console.log(`Payment successful for transaction ${tx_ref}`);
+  } else {
+    console.log(`Payment failed for transaction ${tx_ref}`);
+  }
+  res.status(200).send("Callback received");
 };

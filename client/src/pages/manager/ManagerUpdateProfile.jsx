@@ -5,10 +5,8 @@ import {
   updateStart,
   updateSuccess,
   updateFailure,
-  updatePassStart,
-  updatePassSuccess,
-  updatePassFailure,
 } from "../../redux/user/userSlice";
+import { setCredentials } from "../../redux/auth/authSlice";
 
 const ManagerUpdateProfile = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
@@ -109,7 +107,7 @@ const ManagerUpdateProfile = () => {
       return;
     }
     try {
-      dispatch(updatePassStart());
+      dispatch(setCredentials());
       const res = await fetch(
         `${API_BASE_URL}/api/user/update-password/${currentUser._id}`,
         {
@@ -122,12 +120,12 @@ const ManagerUpdateProfile = () => {
       );
       const data = await res.json();
       if (data.success === false && res.status !== 201 && res.status !== 200) {
-        dispatch(updatePassFailure(data?.message));
+        dispatch(setCredentials(data?.message));
         alert("Session Ended! Please login again");
         navigate("/login");
         return;
       }
-      dispatch(updatePassSuccess());
+      dispatch(setCredentials());
       alert(data?.message);
       setUpdatePassword({
         oldpassword: "",
@@ -135,7 +133,7 @@ const ManagerUpdateProfile = () => {
       });
     } catch (error) {
       console.error(error);
-      dispatch(updatePassFailure("Failed to update password"));
+      dispatch(setCredentials("Failed to update password"));
     }
   };
 

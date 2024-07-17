@@ -5,6 +5,7 @@ import DashProfile from "../components/DashProfile";
 import DashUsers from "../components/DashUsers";
 import DashboardComp from "../components/DashbordComponet";
 import ManagerDashboard from "./manager/ManagerDashboard";
+import AdminDashboard from "./Admin/AdminDashboard";
 
 export default function Dashboard() {
   const location = useLocation();
@@ -36,6 +37,7 @@ export default function Dashboard() {
         {tab === "users" && <DashUsers />}
         {tab === "dash" && <DashboardComp />}
         {tab === "manager" && <ManagerDashboard />}
+        {tab === "admin" && <AdminDashboard />}
       </div>
     </div>
   );

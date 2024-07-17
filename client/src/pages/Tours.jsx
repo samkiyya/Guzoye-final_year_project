@@ -4,6 +4,7 @@ import { FaRankingStar } from "react-icons/fa6";
 import { LuBadgePercent } from "react-icons/lu";
 import { useNavigate } from "react-router";
 import TourCard from "./TourCard";
+import axios from "axios";
 import "./Tours.css";
 
 const Tours = () => {
@@ -19,38 +20,50 @@ const Tours = () => {
   const getTopTours = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${API_BASE_URL}/api/tour/search/getTourBySearch?sort=reviews&limit=8`
+      console.log("Sending request to fetch top tours");
+      const res = await axios.get(
+        `${API_BASE_URL}/api/tours/search/getTourBySearch`,
+        {
+          params: {
+            sort: "reviews",
+            limit: 8,
+          },
+        }
       );
-      const data = await res.json();
-      if (data?.success) {
-        setTopTours(data?.data);
+      console.log("Response received:", res);
+      if (res.data && res.data.success) {
+        setTopTours(res.data.data);
         setLoading(false);
       } else {
         setLoading(false);
-        alert(data?.message || "Something went wrong!");
+        alert(res.data?.message || "Something went wrong!");
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching top tours:", error);
+      alert("Failed to fetch top tours. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const getLatestTours = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${API_BASE_URL}/api/tour?sort=createdAt&limit=8`
-      );
-      const data = await res.json();
-      if (data?.success) {
-        setLatestTours(data?.data);
+      const res = await axios.get(`${API_BASE_URL}/api/tours`, {
+        params: { sort: "createdAt", limit: 8 },
+      });
+      if (res.data.success) {
+        setLatestTours(res.data.data);
         setLoading(false);
       } else {
         setLoading(false);
-        alert(data?.message || "Something went wrong!");
+        alert(res.data.message || "Something went wrong!");
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching Latest tours:", error);
+      alert("Failed to fetch Latest tours. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,15 +71,22 @@ const Tours = () => {
     try {
       setLoading(true);
       const res = await fetch(
-        `${API_BASE_URL}/api/tour/search/getTourBySearch?sort=createdAt&offer=true&limit=6`
+        `${API_BASE_URL}/api/tours/search/getTourBySearch`,
+        {
+          params: {
+            sort: "createdAt",
+            offer: true,
+            limit: 6,
+          },
+        }
       );
-      const data = await res.json();
-      if (data?.success) {
+      const data = await res.data;
+      if (data.success) {
         setOfferTours(data?.data);
         setLoading(false);
       } else {
         setLoading(false);
-        alert(data?.message || "Something went wrong!");
+        alert(data.message || "Something went wrong!");
       }
     } catch (error) {
       console.log(error);
@@ -160,6 +180,9 @@ const Tours = () => {
               <h1 className="text-2xl font-semibold">Top Tours</h1>
               <div className="flex flex-wrap gap-2 my-3">
                 {topTours.map((tourData, i) => {
+                  {
+                    console.log("tour data is ", tourData);
+                  }
                   return <TourCard key={i} tourData={tourData} />;
                 })}
               </div>

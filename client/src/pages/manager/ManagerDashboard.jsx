@@ -3,15 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   updateStart,
-  signoutStart,
-  signoutSuccess,
-  signoutFailure,
   updateSuccess,
   updateFailure,
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
 } from "../../redux/user/userSlice";
+import {
+  signoutStart,
+  signoutSuccess,
+  signoutFailure,
+} from "../../redux/auth/authSlice";
 import {
   getDownloadURL,
   getStorage,
@@ -20,10 +22,9 @@ import {
 } from "firebase/storage";
 import { app } from "../../firebase";
 import AllBookings from "./AllBookings";
-import AdminUpdateProfile from "./ManagerUpdateProfile";
+import ManagerUpdateProfile from "./ManagerUpdateProfile";
 import AddPackages from "./AddPackages";
 import AllPackages from "./AllPackages";
-import AllUsers from "./AllUsers";
 import Payments from "./Payments";
 import RatingsReviews from "./RatingsReviews";
 import History from "./History";
@@ -294,11 +295,10 @@ const ManagerDashboard = () => {
                 {activePanelId === 1 && <AllBookings />}
                 {activePanelId === 2 && <AddPackages />}
                 {activePanelId === 3 && <AllPackages />}
-                {activePanelId === 4 && <AllUsers />}
-                {activePanelId === 5 && <Payments />}
-                {activePanelId === 6 && <RatingsReviews />}
-                {activePanelId === 7 && <History />}
-                {activePanelId === 8 && <AdminUpdateProfile />}
+                {activePanelId === 4 && <Payments />}
+                {activePanelId === 5 && <RatingsReviews />}
+                {activePanelId === 6 && <History />}
+                {activePanelId === 7 && <ManagerUpdateProfile />}
               </div>
             </div>
           </div>

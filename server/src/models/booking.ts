@@ -1,62 +1,109 @@
 import mongoose, { Schema } from "mongoose";
 
 export type BookingType = {
-  packageDetails: mongoose.Types.ObjectId;
-  buyer: mongoose.Types.ObjectId;
-  userEmail: string;
-  tourName: string;
-  fullName: string;
+  user: Schema.Types.ObjectId;
+  BookingTravels: [
+    {
+      name: string;
+      qty: number;
+      image: string;
+      price: number;
+      travel: Schema.Types.ObjectId;
+    }
+  ];
+  travelerAddress: {
+    address: string;
+    phone: number;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
+  paymentMethod: string;
+  paidAt: Date;
+  paymentResult: {
+    id: string;
+    status: string;
+    update_time: string;
+    email_address: string;
+  };
+  travelsPrice: number;
+  taxPrice: number;
+  isPaid: boolean;
   totalPrice: number;
   guestSize: number;
-  phone: number;
-  date: string;
-  status: string;
   bookAt: Date;
-  createdAt?: Date; // Optional, added because of timestamps: true in schema
-  updatedAt?: Date;
 };
+
 const bookingSchema = new mongoose.Schema<BookingType>(
   {
-    packageDetails: {
-      type: Schema.Types.ObjectId,
-      ref: "Package",
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "User",
     },
-    tourName: {
+    BookingTravels: [
+      {
+        name: { type: String, required: true },
+        qty: { type: Number, required: true },
+        image: { type: String, required: true },
+        price: { type: Number, required: true },
+        travel: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+          ref: "travel",
+        },
+      },
+    ],
+
+    travelerAddress: {
+      address: { type: String, required: true },
+      phone: {
+        type: Number,
+        required: true,
+      },
+      city: { type: String, required: true },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true },
+    },
+    paymentMethod: {
       type: String,
       required: true,
     },
-    buyer: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-      required: true,
+    paymentResult: {
+      id: { type: String },
+      status: { type: String },
+      update_time: { type: String },
+      email_address: { type: String },
     },
-    userEmail: {
-      type: String,
-    },
-    fullName: {
-      type: String,
+    travelsPrice: {
+      type: Number,
       required: true,
+      default: 0.0,
+    },
+
+    taxPrice: {
+      type: Number,
+      required: true,
+      default: 0.0,
     },
     totalPrice: {
       type: Number,
       required: true,
+      default: 0.0,
+    },
+
+    isPaid: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+
+    paidAt: {
+      type: Date,
     },
     guestSize: {
       type: Number,
       required: true,
-    },
-    phone: {
-      type: Number,
-      required: true,
-    },
-    date: {
-      type: String,
-      required: true,
-    },
-    status: {
-      type: String,
-      default: "Booked",
     },
     bookAt: {
       type: Date,

@@ -11,10 +11,10 @@ import { validate } from "../middleware/validate";
 const router = express.Router();
 
 //registration route
-router.post("/register", validate, register);
+router.post("/register", register);
 
 //login route
-router.post("/login", validate, login);
+router.post("/login", login);
 
 //login route using google auth
 router.post("/google", googleAuth);

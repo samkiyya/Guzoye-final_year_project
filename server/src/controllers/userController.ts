@@ -33,7 +33,7 @@ export const updateUser = async (
         message: "Password must be at least 8 characters",
       });
     }
-    req.body.password = bcrypt.hashSync(req.body.password, 10);
+    req.body.password = bcrypt.hash(req.body.password, 10);
   }
 
   // Check for existing email
@@ -194,7 +194,7 @@ export const updateUserPassword = async (req: Request, res: Response) => {
     }
 
     const { oldpassword, newpassword } = req.body;
-    const validPassword = bcrypt.compareSync(oldpassword, validUser.password);
+    const validPassword = bcrypt.compare(oldpassword, validUser.password);
     if (!validPassword) {
       return res.status(200).send({
         success: false,
@@ -202,7 +202,7 @@ export const updateUserPassword = async (req: Request, res: Response) => {
       });
     }
 
-    const updatedHashedPassword = bcrypt.hashSync(newpassword, 10);
+    const updatedHashedPassword = bcrypt.hash(newpassword, 10);
     await User.findByIdAndUpdate(
       id,
       { $set: { password: updatedHashedPassword } },

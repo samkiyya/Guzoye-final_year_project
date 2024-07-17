@@ -2,49 +2,41 @@ import express from "express";
 import { verifyToken, verifyRole } from "../middleware/auth";
 import {
   bookPackage,
-  cancelBooking,
-  deleteBookingHistory,
+  countTotalOrders,
+  calculateTotalSales,
+  calculateTotalSalesByDate,
+  getUserCurrentBookings,
   getAllBookings,
   getAllUserBookings,
-  getCurrentBookings,
-  getUserCurrentBookings,
+  markOrderAsPaid,
+  deleteBookingHistory,
+  cancelBooking,
 } from "../controllers/bookingController";
 
 const router = express.Router();
 
 // book package
-router.post("/book-package/:packageId", verifyToken, bookPackage);
-
-//get all current bookings manager
-router.get(
-  "/get-currentBookings",
-  verifyToken,
-  verifyRole(["manager"]),
-  getCurrentBookings
-);
-
-//get all bookings admin
-router.get(
-  "/get-allBookings",
-  verifyToken,
-  verifyRole(["manager"]),
-  getAllBookings
-);
+router
+  .route("/")
+  .post(verifyToken, bookPackage)
+  .get(verifyToken, verifyRole(["manager"]), getAllBookings);
 
 //get all current bookings by user id
-router.get("/get-UserCurrentBookings/:id", verifyToken, getUserCurrentBookings);
+router.route("/:id").get(verifyToken, getUserCurrentBookings);
 
-//get all bookings by user id
-router.get("/get-allUserBookings/:id", verifyToken, getAllUserBookings);
+//get all bookings history by user id
+router.route("/mine").get(verifyToken, getAllUserBookings);
 
+router.route("/total-orders").get(countTotalOrders);
+router.route("/total-sales").get(calculateTotalSales);
+router.route("/total-sales-by-date").get(calculateTotalSalesByDate);
+router.route("/:id/pay").put(verifyToken, markOrderAsPaid);
 //delete history of booking
-router.delete(
-  "/delete-booking-history/:id/:userId",
-  verifyToken,
-  deleteBookingHistory
-);
+router
+  .route("/delete-booking/:id/:userId")
+  .delete(verifyToken, deleteBookingHistory);
 
 //cancle booking by id
-router.post("/cancel-booking/:id/:userId", verifyToken, cancelBooking);
+router.route("/cancel-booking/:id/:userId").post(verifyToken, cancelBooking);
 
 export default router;

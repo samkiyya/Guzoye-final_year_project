@@ -19,20 +19,20 @@ const TourCard = ({ tourData }) => {
   };
 
   return (
-    <Link to={`/tour/${tourData._id}`} className="w-max">
+    <Link to={`/tours/${tourData?._id}`} className="w-max">
       <div className="bg-white border flex flex-col items-center p-3 rounded shadow-md overflow-hidden">
         <img
           className="w-[300px] h-[190px] rounded border hover:scale-110 transition-all duration-300"
-          src={tourData.photo[0]}
-          alt={`Tour Image of ${tourData.title}`}
+          src={tourData?.photo[0]}
+          alt={`Tour Image of ${tourData?.title}`}
         />
         <div className="w-full flex flex-col my-2">
           <p className="font-semibold text-lg capitalize w-[90%] xsm:w-[250px]">
-            {tourData.title}
+            {tourData?.title}
           </p>
-          <p className="text-green-700 text-lg capitalize">{tourData.city}</p>
+          <p className="text-green-700 text-lg capitalize">{tourData?.city}</p>
           <p className="flex text-lg items-center gap-2">
-            <FaClock /> {`${tourData.distance} km`}
+            <FaClock /> {`${tourData?.distance} km`}
           </p>
           <div className="flex flex-wrap justify-between">
             <p className="flex items-center text-lg">
@@ -46,11 +46,11 @@ const TourCard = ({ tourData }) => {
                   <StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />
                 }
               />
-              ({tourData.reviews.length})
+              ({tourData?.reviews?.length})
             </p>
             <p className="flex gap-1">
               <span className="line-through text-gray-700">
-                ${tourData.price}
+                ${tourData?.price}
               </span>
             </p>
           </div>

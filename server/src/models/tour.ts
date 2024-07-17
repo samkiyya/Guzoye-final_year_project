@@ -1,4 +1,3 @@
-import { ReviewType } from "./review";
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface TourType extends Document {
@@ -7,14 +6,14 @@ export interface TourType extends Document {
   address: string;
   distance: number;
   desc: string;
-  maxGroupSize: number;
+  maxGroupSize?: number;
   price: number;
   featured: boolean;
-  reviews: string[];
+  reviews: Schema.Types.ObjectId[];
   photo: string[];
-  createdAt?: Date;
-  lastUpdated?: Date;
   usrId?: string;
+  createdAt?: Date;
+  updatedAt?: Date; // 'updatedAt' is more commonly used than 'lastUpdated'
 }
 
 const tourSchema = new Schema<TourType>(
@@ -26,9 +25,13 @@ const tourSchema = new Schema<TourType>(
     photo: { type: [String], required: true },
     desc: { type: String, required: true },
     price: { type: Number, required: true },
-    maxGroupSize: { type: Number, required: true },
-    reviews: { type: [String], required: true },
-    lastUpdated: { type: Date, default: Date.now },
+    maxGroupSize: { type: Number },
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
     featured: { type: Boolean, required: true },
     usrId: { type: String },
   },

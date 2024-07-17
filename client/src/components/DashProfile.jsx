@@ -12,13 +12,15 @@ import {
   updateStart,
   updateSuccess,
   updateFailure,
-  signoutStart,
-  signoutSuccess,
-  signoutFailure,
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
 } from "../redux/user/userSlice";
+import {
+  signoutStart,
+  signoutSuccess,
+  signoutFailure,
+} from "../redux/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";

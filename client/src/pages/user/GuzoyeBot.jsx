@@ -39,7 +39,7 @@ const GuzoyeBot = () => {
       {showBot && (
         <div className="chatbot-container">
           <div className="chatbot-header">
-            <div className="chatbot-title">Ethiopian Tourism Bot</div>
+            <div className="chatbot-title">ጉZOዬ Travel Bot</div>
             <div className="chatbot-menu">
               <button
                 className="menu-button"
