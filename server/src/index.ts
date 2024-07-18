@@ -11,6 +11,7 @@ import bookingRoutes from "./routes/booking";
 import chapaRoutes from "./routes/chapaRoutes";
 import connectDB from "./config/db";
 import path from "path";
+import morgan from "morgan";
 import { v2 as cloudinary } from "cloudinary";
 dotenv.config({});
 
@@ -32,6 +33,7 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
+app.use(morgan("dev")); //logger
 app.use(cookieParser());
 
 // Serve static files during deployment
@@ -61,8 +63,8 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   const message = err.message || "Internal Server Error";
   res.status(statusCode).json({
     success: false,
-    statusCode,
-    message,
+    status: statusCode,
+    error: message,
   });
 });
 

@@ -18,15 +18,29 @@ export interface UserType extends Document {
 
 const userSchema = new mongoose.Schema<UserType>(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: {
+      type: String,
+      required: [true, "First name is required"],
+    },
+    lastName: {
+      type: String,
+      required: [true, "Last name is required"],
+    },
     username: {
       type: String,
-      required: true,
+      required: [true, "Username is required"],
       unique: true,
     },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Password required"],
+      minLength: [8, "Minimum password length is 8 character"],
+    },
     skill: {
       type: String,
     },
@@ -52,13 +66,17 @@ const userSchema = new mongoose.Schema<UserType>(
   }
 );
 
-// // hashing the password before save
-// userSchema.pre<UserType>("save", async function (next) {
-//   if (this.isModified("password")) {
-//     this.password = await bcrypt.hash(this.password, 8);
-//   }
-//   next();
-// });
+// hashing the password before save
+userSchema.pre<UserType>("save", async function (next) {
+  try {
+    if (this.isModified("password")) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
+  } catch (error: any) {
+    next(error);
+  }
+});
 
 const User: Model<UserType> = mongoose.model<UserType>("User", userSchema);
 export default User;

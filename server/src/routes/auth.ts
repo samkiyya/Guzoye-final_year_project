@@ -6,7 +6,6 @@ import {
   logout,
   register,
 } from "../controllers/authController";
-import { validate } from "../middleware/validate";
 
 const router = express.Router();
 

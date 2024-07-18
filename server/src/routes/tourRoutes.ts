@@ -26,8 +26,8 @@ const upload = multer({
 // Create Tour - Accessible only by manager
 router.post(
   "/",
-  verifyToken,
-  verifyRole(["manager"]),
+  // verifyToken,
+  // verifyRole(["manager"]),
   [
     body("title").notEmpty().withMessage("Title is required").isString(),
     body("city").notEmpty().withMessage("City is required").isString(),
@@ -53,6 +53,7 @@ router.post(
   upload.array("imageFiles", 6),
   createTour
 );
+router.get("/search", getTourBySearch);
 
 // Get tours by search
 router.get("/search/getTourBySearch", getTourBySearch);

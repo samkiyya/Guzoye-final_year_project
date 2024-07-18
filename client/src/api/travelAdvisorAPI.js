@@ -11,6 +11,10 @@ export const getPlacesData = async (type, sw, ne) => {
           bl_longitude: sw.lng,
           tr_longitude: ne.lng,
           tr_latitude: ne.lat,
+          limit: "20",
+          currency: "USD",
+          lunit: "km",
+          lang: "en_US",
         },
         headers: {
           "x-rapidapi-key": import.meta.env
@@ -23,6 +27,29 @@ export const getPlacesData = async (type, sw, ne) => {
     return response.data.data;
   } catch (error) {
     console.error("getPlacesData error: ", error);
+    if (error.response.status === 429) {
+      const {
+        data: { data },
+      } = await axios.get(
+        `https://travel-advisor.p.rapidapi.com/${type}/list-in-boundary`,
+        {
+          params: {
+            limit: "20",
+            currency: "ETB",
+            bl_latitude: sw.lat,
+            tr_latitude: ne.lat,
+            bl_longitude: sw.lng,
+            tr_longitude: ne.lng,
+          },
+          headers: {
+            "x-rapidapi-host": "travel-advisor.p.rapidapi.com",
+            "x-rapidapi-key":
+              "d46bd01c2cmsh4e9573f5eeece4cp104fcejsn4016dc963204",
+          },
+        }
+      );
+      return data;
+    }
   }
 };
 
@@ -42,7 +69,7 @@ export const getWeatherData = async (lat, lng) => {
           },
         }
       );
-      return response.data;
+      return response.data.data;
     }
   } catch (error) {
     console.error("getWeatherData error: ", error);

@@ -14,14 +14,7 @@ export const register = async (
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { firstName, lastName, username, email, isEthiopian, role, password } =
-    req.body as UserType;
-
-  if (!username || !email || !password || !firstName || !lastName) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Please fill all the required fields" });
-  }
+  const { username, email } = req.body as UserType;
 
   try {
     if (username.length < 7 || username.length > 20) {
@@ -54,20 +47,9 @@ export const register = async (
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create(req.body);
 
-    const newUser = new User({
-      firstName,
-      lastName,
-      username,
-      email,
-      password: hashedPassword,
-      isEthiopian,
-      role,
-    });
-
-    await newUser.save();
-
+    //create token
     const token = jwt.sign(
       { userId: newUser._id, userRole: newUser.role },
       process.env.JWT_SECRET_KEY as string,
@@ -80,26 +62,26 @@ export const register = async (
       maxAge: 1000 * 60 * 60 * 24,
     });
 
-    res.status(201).json({ message: "User registered successfully" });
+    res
+      .status(201)
+      .json({ message: "User registered successfully", data: token });
   } catch (err) {
-    console.error(err);
+    next(err);
     res.status(500).json({ message: "Something went wrong, please try again" });
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, email, password } = req.body;
-
-  if (!email || !password) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Please fill all the required fields" });
-  }
+  const { username, email } = req.body;
 
   try {
     const validUser = await User.findOne({ $or: [{ email }, { username }] });
@@ -119,6 +101,7 @@ export const login = async (req: Request, res: Response) => {
         .json({ success: false, message: "Incorrect email or password" });
     }
 
+    //create token
     const token = jwt.sign(
       { userId: validUser.id, userRole: validUser.role },
       process.env.JWT_SECRET_KEY as string,
@@ -134,10 +117,10 @@ export const login = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Logged in successfully",
-      data: { email, role: validUser.role },
+      data: { email: validUser.email, role: validUser.role, token },
     });
-  } catch (err) {
-    console.error(err);
+  } catch (error: any) {
+    next(error);
     res.status(500).json({
       success: false,
       message: "Something went wrong, please try to login again",
@@ -205,8 +188,8 @@ export const googleAuth = async (
     });
 
     res.status(201).json({ message: "User created successfully" });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    next(error);
     res.status(500).json({
       success: false,
       message: "Something went wrong, please try to login again",

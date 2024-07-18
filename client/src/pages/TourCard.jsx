@@ -3,8 +3,6 @@ import { Rating } from "@mui/material";
 import { FaClock } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-
-// Assuming StarIcon is imported from @mui/icons-material
 import StarIcon from "@mui/icons-material/Star";
 
 const TourCard = ({ tourData }) => {

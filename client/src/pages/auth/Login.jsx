@@ -1,26 +1,50 @@
-import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Alert } from "flowbite-react";
 import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect, useContext } from "react";
+import {
+  Avatar,
+  Container,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  Button,
+  Box,
+  TextField,
+  IconButton,
+  InputAdornment,
+  FormControl,
+} from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import { useLoginMutation } from "../../redux/api/usersApiSlice";
-import Loader from "../../components/Loader";
 import { setCredentials } from "../../redux/auth/authSlice";
-import OAuth from "../../components/OAuth"; // Assuming you have an OAuth component for handling Google login
+import { login } from "../../api/authAPI";
+import { AuthContext } from "../../context/AuthContext";
+import { getUser } from "../../api/userAPI";
+import Loader from "../../components/Loader";
+import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
+import OAuth from "../../components/OAuth";
+
+const initialFormData = {
+  email: "",
+  password: "",
+};
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(null);
+  const theme = useTheme();
+  const [form, setForm] = useState(initialFormData);
+  const [serverError, setServerError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const { setAuthUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const isBigScreen = useMediaQuery(theme.breakpoints.up("md"));
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const [login, { isLoading }] = useLoginMutation();
-  const { userInfo } = useSelector((state) => state.auth);
-
   const { search } = useLocation();
-  const sp = new URLSearchParams(search);
-  const redirect = sp.get("redirect") || "/";
+  const redirect = new URLSearchParams(search).get("redirect") || "/";
+  const { userInfo } = useSelector((state) => state.auth);
+  const [login, { isLoading }] = useLoginMutation();
 
   useEffect(() => {
     if (userInfo) {
@@ -28,15 +52,57 @@ export default function Login() {
     }
   }, [navigate, redirect, userInfo]);
 
-  const submitHandler = async (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (event) => event.preventDefault();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const res = await login({ email, password }).unwrap();
-      dispatch(setCredentials({ ...res }));
-      navigate(redirect);
-    } catch (err) {
-      setErrorMessage(err?.data?.message || err.error);
+    const authAPI = await login(form);
+    if (form.email.length === 0 || form.password.length === 0) {
+      setServerError("Please fill out all fields are required.");
+      return;
     }
+    try {
+      if (authAPI && !authAPI.error) {
+        const token = authAPI.token;
+        localStorage.setItem("token", token);
+        const user = await getUser();
+        setAuthUser({
+          _id: user._id,
+          email: user.email,
+          firstName: user.firstName,
+          token: token,
+        });
+        setServerError(null);
+        navigate("/home");
+      } else {
+        setServerError(authAPI.error);
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      setServerError("Failed to login. Please try again.");
+    }
+  };
+
+  const inputStyle = {
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: theme.palette.primary.main,
+        borderWidth: "2px",
+      },
+      "&:hover fieldset": {
+        borderColor: theme.palette.primary.light,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: theme.palette.primary.light,
+      },
+    },
+    color: theme.palette.primary.light,
   };
 
   const googleSuccess = async (response) => {
@@ -50,90 +116,124 @@ export default function Login() {
       console.log("log in success result is", res);
       navigate(redirect);
     } catch (err) {
-      setErrorMessage("Google login failed");
+      setServerError("Google login failed");
     }
   };
 
   const googleFailure = (response) => {
-    setErrorMessage("Google login failed");
+    setServerError("Google login failed");
     console.error("Google login failed:", response);
   };
 
   return (
-    <div>
-      <section className="pl-[10rem] flex flex-wrap">
-        <div className="mr-[4rem] mt-[5rem]">
-          <h1 className="text-2xl font-semibold mb-4">Sign In</h1>
-
-          <form onSubmit={submitHandler} className="container w-[40rem]">
-            <div className="my-[2rem]">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-white"
-              >
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                className="mt-1 p-2 border rounded w-full"
-                placeholder="Enter email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            <div className="mb-4">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-white"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                className="mt-1 p-2 border rounded w-full"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-
-            <button
-              disabled={isLoading}
-              type="submit"
-              className="bg-pink-500 text-white px-4 py-2 rounded cursor-pointer my-[1rem]"
-            >
-              {isLoading ? "Signing In..." : "Sign In"}
-            </button>
-
-            {isLoading && <Loader />}
-          </form>
-
-          {errorMessage && (
-            <Alert className="mt-5" color="failure">
-              {errorMessage}
-            </Alert>
+    <Container
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        alignItems: "center",
+        paddingTop: 4,
+      }}
+    >
+      <Box
+        sx={{
+          color: theme.palette.primary.dark,
+        }}
+      >
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ fontWeight: 500, color: theme.palette.primary.dark }}
+        >
+          Log In
+        </Typography>
+      </Box>
+      <ValidatorForm
+        component="form"
+        onSubmit={handleSubmit}
+        autoComplete="off"
+        noValidate
+        style={{
+          width: isBigScreen ? "30%" : "60%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <TextField
+          label="Email"
+          variant="outlined"
+          type="email"
+          name="email"
+          sx={{ ...inputStyle, margin: "20px auto" }}
+          required
+          fullWidth
+          value={form.email}
+          onChange={handleChange}
+          errorMessages={["The Email field is required."]}
+        />
+        <FormControl
+          sx={{ ...inputStyle, width: "100%" }}
+          variant="outlined"
+          required
+        >
+          <TextValidator
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            value={form.password}
+            onChange={handleChange}
+            sx={{ ...inputStyle, width: "100%" }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                    sx={{ color: theme.palette.primary.main }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            label="Password"
+          />
+        </FormControl>
+        <div className="pt-1 pb-4 text-sm text-red-800 font-semibold text-center">
+          {typeof serverError === "string" && (
+            <Typography color="error">{serverError}</Typography>
           )}
-
-          <div className="mt-4">
-            <OAuth onSuccess={googleSuccess} onFailure={googleFailure} />
-          </div>
-
-          <div className="mt-4">
-            <p className="text-white">
-              New Customer?{" "}
-              <Link
-                to={redirect ? `/register?redirect=${redirect}` : "/register"}
-                className="text-pink-500 hover:underline"
-              >
-                Register
-              </Link>
-            </p>
-          </div>
         </div>
-      </section>
-    </div>
+        <Button
+          type="submit"
+          variant="contained"
+          size="medium"
+          sx={{
+            fontSize: theme.typography.body1,
+            fontWeight: 500,
+            margin: "5px auto",
+          }}
+          endIcon={<KeyboardArrowRight />}
+        >
+          {isLoading ? "Signing In..." : "Sign In"}
+        </Button>
+        {isLoading && <Loader />}
+      </ValidatorForm>
+      <div className="mt-4">
+        <OAuth onSuccess={googleSuccess} onFailure={googleFailure} />
+      </div>
+      <div className="mt-4">
+        <p className="text-blue-500">
+          New Customer?{" "}
+          <Link
+            to={redirect ? `/register?redirect=${redirect}` : "/register"}
+            className="text-pink-500 hover:underline"
+          >
+            Register
+          </Link>
+        </p>
+      </div>
+    </Container>
   );
 }

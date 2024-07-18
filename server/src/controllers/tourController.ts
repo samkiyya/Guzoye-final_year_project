@@ -2,6 +2,13 @@ import { Request, Response } from "express";
 import cloudinary from "cloudinary";
 import Tour, { TourType } from "../models/tour";
 
+interface TourSearchQuery {
+  city?: string;
+  distance?: string;
+  maxGroupSize?: string;
+  sort?: string;
+  limit?: string;
+}
 // Create Tour
 export const createTour = async (req: Request, res: Response) => {
   const {
@@ -157,17 +164,26 @@ export const getTours = async (req: Request, res: Response) => {
 };
 
 // Get Tours by searching
-export const getTourBySearch = async (req: Request, res: Response) => {
-  // 'i' means case sensetive
-  const city = new RegExp(req.query.city as string, "i");
-  const distance = parseInt(req.query.distance as string, 10);
-  const maxGroupSize = parseInt(req.query.maxGroupSize as string, 10);
+export const getTourBySearch = async (
+  req: Request<{}, {}, {}, TourSearchQuery>,
+  res: Response
+) => {
+  // 'i' means case insensitive
+  const city = req.query.city ? new RegExp(req.query.city, "i") : undefined;
+  const distance = req.query.distance
+    ? parseInt(req.query.distance, 10)
+    : undefined;
+  const maxGroupSize = req.query.maxGroupSize
+    ? parseInt(req.query.maxGroupSize, 10)
+    : undefined;
+
   try {
-    const tours = await Tour.find({
-      city,
-      distance: { $gte: distance },
-      maxGroupSize: { $gte: maxGroupSize },
-    }).populate("reviews");
+    const query: any = {};
+    if (city) query.city = city;
+    if (distance) query.distance = { $gte: distance };
+    if (maxGroupSize) query.maxGroupSize = { $gte: maxGroupSize };
+
+    const tours = await Tour.find(query).populate("reviews");
     res.status(200).json({
       success: true,
       message: "Tour fetched successfully",

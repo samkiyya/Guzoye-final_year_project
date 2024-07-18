@@ -6,6 +6,20 @@ import User, { UserType } from "../models/user";
 import guideSchedule, { GuideScheduleType } from "../models/guideSchedule";
 import userSchedule, { UserScheduleType } from "../models/userSchedule";
 import Quiz from "../models/quizModel";
+
+// get User
+export const getUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await User.findById(req.params.id);
+    res.json(result);
+  } catch (error: any) {
+    next(error);
+  }
+};
 // Update User details
 export const updateUser = async (
   req: Request,
@@ -33,8 +47,8 @@ export const updateUser = async (
         message: "Password must be at least 8 characters",
       });
     }
-    req.body.password = bcrypt.hash(req.body.password, 10);
   }
+  const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
   // Check for existing email
   if (req.body.email) {
@@ -96,7 +110,7 @@ export const updateUser = async (
     const updatedUserDetails = {
       username: req.body.username,
       email: req.body.email,
-      password: req.body.password,
+      password: hashedPassword,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       userProfileImg: req.body.userProfileImg,
@@ -223,7 +237,11 @@ export const updateUserPassword = async (req: Request, res: Response) => {
 };
 
 // Delete user account
-export const deleteUserAccount = async (req: Request, res: Response) => {
+export const deleteUserAccount = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const id = req.params.id;
   if (req.body.id !== id) {
     return res.status(401).send({
@@ -233,14 +251,15 @@ export const deleteUserAccount = async (req: Request, res: Response) => {
   }
 
   try {
-    await User.findByIdAndDelete(id);
+    const result = await User.findByIdAndDelete(id);
     res.clearCookie("verify_token");
-    res.status(200).send({
+    res.status(200).json({
       success: true,
       message: "User account has been deleted!",
+      result,
     });
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    next(error);
     res.status(500).send({
       success: false,
       message: "An error occurred while deleting the account",

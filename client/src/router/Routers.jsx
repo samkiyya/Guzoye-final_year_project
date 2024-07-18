@@ -14,11 +14,16 @@ import CreateSchedule from "./../pages/ScheduleForm";
 import Quiz from "./../pages/Quiz";
 import ManagerDashboard from "./../pages/manager/ManagerDashboard";
 import UpdatePackage from "./../pages/manager/UpdatePackage";
+// import BookingHistory from "./../pages/manager/BookingHistory";
+// import PaymentHistory from "./../pages/manager/PaymentHistory";
+// import TourHistory from "./../pages/manager/TourHistory";
+// import TourDetail from "./../pages/manager/TourDetail";
+import AddTour from "./../pages/manager/AddTour";
 import RatingsPage from "./../pages/RatingsPage";
 import PrivateRoute from "./../components/privateRoutes/PrivateRoute";
 import ManagerRoute from "./../components/privateRoutes/ManagerRoute";
 import AdminRoute from "./../components/privateRoutes/AdminRoute";
-import ToursDetail from "./../pages/ToursDetail";
+import ToursDetail from "./../pages/TourDetail";
 import DashUsers from "./../components/DashUsers";
 import MAP from "../pages/MAP/Index";
 import ReturnPage from "./../components/ReturnPage";
@@ -64,6 +69,7 @@ const Routers = () => {
         <Route path="/manager-dashboard" element={<ManagerDashboard />} />
         <Route path="/all-packages" element={<ManagerDashboard />} />
         <Route path="/add-package" element={<ManagerDashboard />} />
+        <Route path="/add-tour" element={<AddTour />} />
         <Route path="/update-package/:id" element={<UpdatePackage />} />
       </Route>
       <Route path="/package/ratings/:id" element={<RatingsPage />} />

@@ -1,55 +1,43 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import { getUser } from "../api/userAPI";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
 
 // Create the context
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [authUser, setAuthUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if the user is already authenticated
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get("/api/auth/validate-token");
-        setUser(response.data);
-      } catch (error) {
-        setUser(null);
-      } finally {
-        setLoading(false);
+    const token = localStorage.getItem("token");
+    setIsLoading(true);
+    const getUserData = async () => {
+      if (token) {
+        const user = await getUser();
+        if (user) {
+          setAuthUser({
+            _id: user._id,
+            email: user.email,
+            username: user.username,
+            firstName: user.firstName,
+            token: token,
+          });
+        } else {
+          setAuthUser(null);
+          setIsLoading(false);
+        }
       }
+      setIsLoading(false);
     };
 
-    fetchUser();
+    getUserData();
   }, []);
-
-  const login = async (credentials) => {
-    try {
-      const response = await axios.post("/api/auth/login", credentials);
-      setUser(response.data);
-      navigate("/");
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await axios.post("/api/auth/logout");
-      setUser(null);
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {!loading && children}
+    <AuthContext.Provider
+      value={{ authUser, setAuthUser, isLoading, setIsLoading }}
+    >
+      {children}
     </AuthContext.Provider>
   );
 };

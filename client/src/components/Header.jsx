@@ -29,7 +29,7 @@ const nav__links = [
   },
   {
     path: "/map",
-    display: "Navigate With Map",
+    display: "Nearby",
   },
 ];
 

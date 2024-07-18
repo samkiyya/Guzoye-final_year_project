@@ -46,19 +46,9 @@ router.get(
 // User routes
 router.put("/:id", verifyToken, verifyRole(["traveler"]), updateUser);
 
-router.post(
-  "/update-profile-photo/:id",
-  verifyToken,
-  verifyRole(["traveler"]),
-  updateProfilePhoto
-);
+router.put("/update-profile-photo/:id", verifyToken, updateProfilePhoto);
 
-router.post(
-  "/update-password/:id",
-  verifyToken,
-  verifyRole(["traveler"]),
-  updateUserPassword
-);
+router.put("/update-password/:id", verifyToken, updateUserPassword);
 
 router.delete(
   "/delete/:id",
