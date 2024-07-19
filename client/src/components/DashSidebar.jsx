@@ -13,7 +13,6 @@ import { useDispatch, useSelector } from "react-redux";
 export default function DashSidebar() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
   const navigate = useNavigate();
-
   const location = useLocation();
   const [tab, setTab] = useState("");
   const dispatch = useDispatch();
@@ -27,19 +26,19 @@ export default function DashSidebar() {
     }
   }, [location.search]);
 
-  const whichUser = () => {
-    if (currentUser.role === "admin") {
-      return "Admin";
-    } else if (currentUser.role === "manager") {
-      return "Manager";
-    } else {
-      if (currentUser.role === "guide") {
-        return "Guide";
-      } else {
-        return "User";
-      }
-    }
+  // Define role-based sidebar items
+  const sidebarItems = {
+    admin: [
+      { to: "/dashboard?tab=dash", icon: HiChartPie, label: "Dashboard" },
+      { to: "/dashboard?tab=users", icon: HiOutlineUserGroup, label: "Users" },
+    ],
+    manager: [
+      { to: "/dashboard?tab=manager", icon: HiChartPie, label: "Dashboard" },
+    ],
+    guide: [{ to: "/dashboard?tab=profile", icon: HiUser, label: "Profile" }],
+    user: [{ to: "/dashboard?tab=profile", icon: HiUser, label: "Profile" }],
   };
+
   const handleSignout = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/user/logout`, {
@@ -47,13 +46,13 @@ export default function DashSidebar() {
       });
       const data = await res.json();
       if (!res.ok) {
-        console.log(data.message);
+        console.error("Sign out failed:", data.message);
       } else {
         dispatch(signoutSuccess());
         navigate("/login");
       }
     } catch (error) {
-      console.log(error.message);
+      console.error("Sign out error:", error.message);
     }
   };
 
@@ -61,61 +60,24 @@ export default function DashSidebar() {
     <Sidebar className="w-full md:w-56">
       <Sidebar.Items>
         <Sidebar.ItemGroup className="flex flex-col gap-1">
-          {currentUser && currentUser.role == "admin" && (
-            <Link to="/dashboard?tab=dash">
+          {sidebarItems[currentUser.role]?.map((item) => (
+            <Link key={item.to} to={item.to}>
               <Sidebar.Item
-                active={tab === "dash" || !tab}
-                icon={HiChartPie}
+                active={tab === item.to.split("?tab=")[1] || !tab}
+                icon={item.icon}
                 as="div"
                 className="hover:bg-gray-400"
+                aria-label={item.label}
               >
-                Dashboard
+                {item.label}
               </Sidebar.Item>
             </Link>
-          )}
-          {currentUser && currentUser.role == "manager" && (
-            <Link to="/dashboard?tab=manager">
-              <Sidebar.Item
-                active={tab === "manager" || !tab}
-                icon={HiChartPie}
-                as="div"
-                className="hover:bg-gray-400"
-              >
-                Dashboard
-              </Sidebar.Item>
-            </Link>
-          )}
-
-          <Link to="/dashboard?tab=profile">
-            <Sidebar.Item
-              active={tab === "profile"}
-              icon={HiUser}
-              label={whichUser()}
-              labelColor="dark"
-              as="div"
-              className="hover:bg-gray-400"
-            >
-              Profile
-            </Sidebar.Item>
-          </Link>
-
-          {currentUser.role == "admin" && (
-            <Link to="/dashboard?tab=users">
-              <Sidebar.Item
-                active={tab === "users"}
-                icon={HiOutlineUserGroup}
-                as="div"
-                className="hover:bg-gray-400"
-              >
-                Users
-              </Sidebar.Item>
-            </Link>
-          )}
-
+          ))}
           <Sidebar.Item
             onClick={handleSignout}
             icon={HiArrowSmRight}
             className="cursor-pointer"
+            aria-label="Sign Out"
           >
             Sign Out
           </Sidebar.Item>

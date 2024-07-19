@@ -1,15 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import {
-  Avatar,
   Container,
   Typography,
   useMediaQuery,
   useTheme,
   Button,
   Box,
-  TextField,
   IconButton,
   InputAdornment,
   FormControl,
@@ -19,9 +17,6 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import { useLoginMutation } from "../../redux/api/usersApiSlice";
 import { setCredentials } from "../../redux/auth/authSlice";
-import { login } from "../../api/authAPI";
-import { AuthContext } from "../../context/AuthContext";
-import { getUser } from "../../api/userAPI";
 import Loader from "../../components/Loader";
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import OAuth from "../../components/OAuth";
@@ -36,14 +31,13 @@ export default function Login() {
   const [form, setForm] = useState(initialFormData);
   const [serverError, setServerError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { setAuthUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const isBigScreen = useMediaQuery(theme.breakpoints.up("md"));
 
   const dispatch = useDispatch();
   const { search } = useLocation();
   const redirect = new URLSearchParams(search).get("redirect") || "/";
-  const { userInfo } = useSelector((state) => state.auth);
+  const userInfo = useSelector((state) => state.auth.currentUser);
   const [login, { isLoading }] = useLoginMutation();
 
   useEffect(() => {
@@ -62,30 +56,33 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const authAPI = await login(form);
-    if (form.email.length === 0 || form.password.length === 0) {
-      setServerError("Please fill out all fields are required.");
+
+    if (!form.email || !form.password) {
+      setServerError("Please fill out all fields.");
       return;
     }
+
     try {
-      if (authAPI && !authAPI.error) {
-        const token = authAPI.token;
-        localStorage.setItem("token", token);
-        const user = await getUser();
-        setAuthUser({
-          _id: user._id,
-          email: user.email,
-          firstName: user.firstName,
+      const authAPI = await login(form).unwrap();
+      const token = authAPI.data.token; // Adjust according to your API response
+      localStorage.setItem("token", token);
+
+      dispatch(
+        setCredentials({
+          id: authAPI.data.id,
+          firstName: authAPI.data.firstName,
+          email: authAPI.data.email,
+          role: authAPI.data.role,
           token: token,
-        });
-        setServerError(null);
-        navigate("/home");
-      } else {
-        setServerError(authAPI.error);
-      }
+          profileImg: authAPI.data.profileImg, // If applicable
+        })
+      );
+
+      setServerError("");
+      navigate(redirect);
     } catch (error) {
       console.error("Login Error:", error);
-      setServerError("Failed to login. Please try again.");
+      setServerError(error.message || "Failed to login. Please try again.");
     }
   };
 
@@ -112,8 +109,8 @@ export default function Login() {
           token: response.tokenId,
           profile: response.profileObj,
         })
-      );
-      console.log("log in success result is", res);
+      ).unwrap();
+      console.log("Log in success:", res);
       navigate(redirect);
     } catch (err) {
       setServerError("Google login failed");
@@ -135,11 +132,7 @@ export default function Login() {
         paddingTop: 4,
       }}
     >
-      <Box
-        sx={{
-          color: theme.palette.primary.dark,
-        }}
-      >
+      <Box sx={{ color: theme.palette.primary.dark }}>
         <Typography
           variant="h4"
           gutterBottom
@@ -159,7 +152,7 @@ export default function Login() {
           flexDirection: "column",
         }}
       >
-        <TextField
+        <TextValidator
           label="Email"
           variant="outlined"
           type="email"
@@ -198,19 +191,21 @@ export default function Login() {
               ),
             }}
             label="Password"
+            validators={["required"]}
+            errorMessages={["Password is required"]}
           />
         </FormControl>
-        <div className="pt-1 pb-4 text-sm text-red-800 font-semibold text-center">
-          {typeof serverError === "string" && (
+        {serverError && (
+          <div className="pt-1 pb-4 text-sm text-red-800 font-semibold text-center">
             <Typography color="error">{serverError}</Typography>
-          )}
-        </div>
+          </div>
+        )}
         <Button
           type="submit"
           variant="contained"
           size="medium"
           sx={{
-            fontSize: theme.typography.body1,
+            fontSize: theme.typography.body1.fontSize,
             fontWeight: 500,
             margin: "5px auto",
           }}

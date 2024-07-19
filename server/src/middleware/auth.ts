@@ -11,6 +11,7 @@ declare global {
   }
 }
 
+// Middleware to verify the token
 export const verifyToken = (
   req: Request,
   res: Response,
@@ -36,7 +37,6 @@ export const verifyToken = (
       return res.status(403).json({ message: "Invalid token" });
     }
 
-    // Add the userId and userRole to the request object
     req.userId = decoded.userId;
     req.userRole = decoded.userRole;
     next();
@@ -45,25 +45,37 @@ export const verifyToken = (
     return res.status(401).json({ message: "Token verification failed" });
   }
 };
+
+// Middleware to verify user roles
 export const verifyRole = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(403).json({ message: "Not authorized. No token" });
+    if (!req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized. No userId in request",
+      });
     }
 
     try {
       const user = await User.findById(req.userId);
 
       if (!user || !allowedRoles.includes(user.role)) {
-        return res.status(403).json({ message: "Forbidden: Access is denied" });
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden: Access is denied",
+        });
       }
+
+      // Add userRole to the request object if needed
+      req.userRole = user.role;
 
       next();
     } catch (error) {
       console.error("Role verification failed:", error);
-      res.status(500).json({ message: "Internal Server Error", error });
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+      });
     }
   };
 };

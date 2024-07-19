@@ -1,27 +1,23 @@
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   Box,
   Button,
   Typography,
-  Avatar,
   FormControl,
   IconButton,
   InputAdornment,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../redux/auth/authSlice";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
-import { Alert } from "flowbite-react";
 import { useRegisterMutation } from "../../redux/api/usersApiSlice";
-import { setCredentials } from "../../redux/auth/authSlice";
-import { signup } from "../../api/authAPI";
 import { getUser } from "../../api/userAPI";
-import { AuthContext } from "../../context/AuthContext";
 import OAuth from "../../components/OAuth";
 import Loader from "../../components/Loader";
 
@@ -31,6 +27,7 @@ const initialFormData = {
   username: "",
   email: "",
   password: "",
+  nationality: false,
 };
 
 export default function Registration() {
@@ -38,15 +35,15 @@ export default function Registration() {
   const [form, setForm] = useState(initialFormData);
   const [serverError, setServerError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { setAuthUser } = useContext(AuthContext);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState(false);
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
   const isBigScreen = useMediaQuery(theme.breakpoints.up("md"));
-
   const { search } = useLocation();
-  const [nationality, setNationality] = useState(false);
-  const [error, setError] = useState(false);
-  const confpassInput = useRef();
   const { userInfo } = useSelector((state) => state.auth);
+
   const [register, { isLoading }] = useRegisterMutation();
   const sp = new URLSearchParams(search);
   const redirect = sp.get("redirect") || "/";
@@ -65,28 +62,62 @@ export default function Registration() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleChangeConfPass = () => {
-    setError(confpassInput.current.value !== form.password);
+  const handleChangeConfPass = (e) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+    setError(value !== form.password);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const authAPI = await signup(form);
-    if (authAPI && !authAPI.error) {
-      const token = authAPI.token;
-      localStorage.setItem("token", token);
-      const user = await getUser();
-      if (user) {
-        setAuthUser({
-          _id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          token: token,
-        });
-        navigate("/");
+
+    if (form.password !== confirmPassword) {
+      setError(true);
+      return;
+    }
+    setError(false); // Reset error before API call
+
+    try {
+      const response = await register(form).unwrap();
+      console.log("Registration Response:", response); // Log the full response
+
+      if (response?.token && response?.data) {
+        const token = response.token;
+        const userData = response.data._doc; // Assuming the response includes userId
+
+        // Check if userData contains _id or other identifier
+        console.log("User data:", userData);
+
+        if (!userData._id) {
+          throw new Error("User ID is missing in the response.");
+        }
+
+        localStorage.setItem("token", token);
+
+        // Pass the userId to getUser function
+        const user = await getUser(userData._id);
+        if (user) {
+          dispatch(
+            setCredentials({
+              _id: user._id,
+              email: user.email,
+              firstName: user.firstName,
+              token: token,
+              role: userData.role,
+              profileImg: userData.profileImg,
+            })
+          );
+          navigate("/");
+        }
+      } else {
+        console.error("Unexpected response format:", response);
+        setServerError(response?.message || "Registration failed.");
       }
-    } else {
-      setServerError(authAPI.error);
+    } catch (err) {
+      console.error("Registration Error:", err);
+      setServerError(
+        err?.data?.message || "Failed to register. Please try again."
+      );
     }
   };
 
@@ -243,7 +274,7 @@ export default function Registration() {
               ]}
               errorMessages={[
                 "This field is required.",
-                "Please provide a password with: \n At least 8 characters. \n One symbol. \n One number. \n One upper letter. \n One lower letter.",
+                "Password must be at least 8 characters long, including one uppercase letter, one lowercase letter, one number, and one special character.",
               ]}
               label="Password"
               InputProps={{
@@ -270,11 +301,11 @@ export default function Registration() {
             <TextValidator
               id="conf-password"
               sx={{ ...inputStyle, width: "100%" }}
-              inputRef={confpassInput}
               type={showPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={handleChangeConfPass}
               error={error}
               helperText={error ? "Passwords don't match." : ""}
-              onChange={handleChangeConfPass}
               label="Confirm Password"
               InputProps={{
                 endAdornment: (
@@ -313,8 +344,10 @@ export default function Registration() {
               id="nationality"
               type="checkbox"
               className="mr-2"
-              checked={nationality}
-              onChange={(e) => setNationality(e.target.checked)}
+              checked={form.nationality || false}
+              onChange={(e) =>
+                setForm({ ...form, nationality: e.target.checked })
+              }
             />
             <label htmlFor="nationality" className="text-sm font-medium">
               Are you Ethiopian?
@@ -334,7 +367,7 @@ export default function Registration() {
             }}
             endIcon={<KeyboardArrowRight />}
           >
-            SignUp
+            Sign Up
           </Button>
         </Box>
         {isLoading && <Loader />}

@@ -64,7 +64,11 @@ export const register = async (
 
     res
       .status(201)
-      .json({ message: "User registered successfully", data: token });
+      .json({
+        message: "User registered successfully",
+        data: { ...newUser },
+        token: token,
+      });
   } catch (err) {
     next(err);
     res.status(500).json({ message: "Something went wrong, please try again" });
@@ -81,10 +85,10 @@ export const login = async (
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, email } = req.body;
+  const { email, password } = req.body;
 
   try {
-    const validUser = await User.findOne({ $or: [{ email }, { username }] });
+    const validUser = await User.findOne({ email });
 
     if (!validUser) {
       return res.status(404).json({
@@ -93,7 +97,7 @@ export const login = async (
       });
     }
 
-    const isMatch = await bcrypt.compare(req.body.password, validUser.password);
+    const isMatch = await bcrypt.compare(password, validUser.password);
 
     if (!isMatch) {
       return res
@@ -101,7 +105,7 @@ export const login = async (
         .json({ success: false, message: "Incorrect email or password" });
     }
 
-    //create token
+    // Create token
     const token = jwt.sign(
       { userId: validUser.id, userRole: validUser.role },
       process.env.JWT_SECRET_KEY as string,
