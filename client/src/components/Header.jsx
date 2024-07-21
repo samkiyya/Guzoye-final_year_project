@@ -1,5 +1,5 @@
 import { Avatar, Button, Dropdown, Navbar } from "flowbite-react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -9,14 +9,17 @@ import {
 } from "../redux/auth/authSlice";
 import { toggleTheme } from "../redux/theme/themeSlice";
 import { useState, useEffect } from "react";
+import "./Header.css";
 
 const navLinks = [
   { path: "/", display: "Home" },
-  { path: "/about", display: "About" },
   { path: "/tours", display: "Tours" },
   { path: "/packages", display: "Packages" },
-  { path: "/contact-us", display: "Contact Us" },
   { path: "/map", display: "Nearby" },
+
+  { path: "/about", display: "About" },
+
+  { path: "/contact-us", display: "Contact Us" },
 ];
 
 const Header = () => {
@@ -27,7 +30,7 @@ const Header = () => {
   const { theme } = useSelector((state) => state.theme);
 
   // State for managing menu visibility
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const setIsMenuOpen = useState(false);
 
   useEffect(() => {
     // This effect can be used for any additional setup if needed
@@ -52,39 +55,64 @@ const Header = () => {
       dispatch(signoutFailure(error.message)); // Failure
     }
   };
+  // Function to open menu
+  const openMenu = () => {
+    setIsMenuOpen(true);
+  };
 
+  // Function to close menu
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
   return (
     <>
-      <Navbar className="sticky top-0 z-10 w-full py-3 px-4 bg-green-400 dark:bg-green-500 sm:px-10 md:px-16 md:py-5">
-        <Link
+      {" "}
+      {(onload = closeMenu)}
+      <Navbar className="sticky top-0 z-10 w-100 py-3 px-4 bg-green-400 dark:bg-green-500 sm:px-10 md:px-16 md:py-5">
+        {/** logo start */}
+
+        <NavLink
           to="/"
           className="self-center whitespace-nowrap text-black text-lg sm:text-xl font-semibold"
         >
           <span className="px-2">ጉZOዬ</span>
-        </Link>
+        </NavLink>
+        {/** logo end */}
 
-        <div className="hidden sm:flex flex-row gap-10">
+        {/** menu/nav start */}
+        <div className=" hidden sm:flex flex-row gap-10">
           {navLinks.map((item, index) => (
-            <Link key={index} to={item.path}>
+            <NavLink
+              key={index}
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+              to={item.path}
+            >
               {item.display}
-            </Link>
+            </NavLink>
           ))}
         </div>
+        {/** menu/nav end */}
 
-        <div className="flex gap-4">
+        <div className="flex me-4">
           <Button
-            className="w-8 h-8 rounded-full sm:w-10 sm:h-10"
+            className="self-center w-8 h-8 rounded-full sm:inline sm:w-10 sm:h-10 md:me-6"
             color="gray"
             pill
             onClick={() => dispatch(toggleTheme())}
           >
-            {theme === "light" ? <FaSun /> : <FaMoon />}
+            {theme === "light" ? (
+              <FaSun className="mx-auto" />
+            ) : (
+              <FaMoon className="mx-auto" />
+            )}
           </Button>
           <img
             src="./icons/menu.png"
             alt="Menu"
-            className="w-7 h-7 cursor-pointer sm:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className=" self-senter w-7 h-7 ms-4 hover:cursor-pointer sm:hidden"
+            onClick={{ openMenu }}
           />
           {currentUser ? (
             <Dropdown
@@ -92,37 +120,38 @@ const Header = () => {
               inline
               label={
                 <div className="hidden sm:inline w-12">
-                  <Avatar alt="user" img={currentUser.userProfileImg} rounded />
+                  <Avatar
+                    alt="Traveler"
+                    img={currentUser.userProfileImg}
+                    rounded
+                  />
                 </div>
               }
               className="hidden sm:inline p-5"
             >
               <Dropdown.Header>
                 <span className="block text-sm">@{currentUser.username}</span>
-                <span className="block text-sm font-medium truncate">
-                  {currentUser.email}
-                </span>
               </Dropdown.Header>
-              <Link to="/dashboard?tab=profile">
+              <NavLink to="/dashboard?tab=profile">
                 <Dropdown.Item>Profile</Dropdown.Item>
-              </Link>
-              <Link to="/dashboard?tab=profile&panelId=1">
+              </NavLink>
+              <NavLink to="/dashboard?tab=profile&panelId=1">
                 <Dropdown.Item>My Bookings</Dropdown.Item>
-              </Link>
-              <Link to="/schedule">
+              </NavLink>
+              <NavLink to="/schedule">
                 <Dropdown.Item>My Schedule</Dropdown.Item>
-              </Link>
+              </NavLink>
               {currentUser.role === "guide" && (
-                <Link to="/quiz">
+                <NavLink to="/quiz">
                   <Dropdown.Item>Take a Quiz</Dropdown.Item>
-                </Link>
+                </NavLink>
               )}
-              <Link to="/dashboard?tab=profile&panelId=2">
+              <NavLink to="/dashboard?tab=profile&panelId=2">
                 <Dropdown.Item>Update Profile</Dropdown.Item>
-              </Link>
-              <Link to="/dashboard?tab=profile&panelId=3">
+              </NavLink>
+              <NavLink to="/dashboard?tab=profile&panelId=3">
                 <Dropdown.Item>My History</Dropdown.Item>
-              </Link>
+              </NavLink>
               <Dropdown.Divider />
               <Dropdown.Item onClick={() => handleSignout()}>
                 Sign Out
@@ -130,114 +159,127 @@ const Header = () => {
             </Dropdown>
           ) : (
             <>
-              <Link to="/login">
-                <Button gradientDuoTone="purpleToBlue" className="text-black">
-                  Sign In
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+                to="/login"
+              >
+                <Button className="text-black hidden md:inline-block border-0">
+                  Login
                 </Button>
-              </Link>
-              <Link to="/register">
-                <Button gradientDuoTone="purpleToBlue" className="text-black">
+              </NavLink>
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+                to="/register"
+              >
+                <Button className="text-black  hidden md:inline-block mt-1 border-black bg-red-600 border-0">
                   Register
                 </Button>
-              </Link>
+              </NavLink>
             </>
           )}
         </div>
       </Navbar>
-
       {/* Mobile Menu */}
       <div
         id="mobileNav"
-        className={`fixed top-0 left-0 z-40 w-full h-full py-16 bg-green-400 dark:bg-green-500 transition-transform transform ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className=" fixed z-40 flex flex-col w-full h-full py-16 top-0 left-0 bg-green-400 dark:bg-green-500 sm:hidden"
       >
-        <Link
+        <NavLink
           to="/"
           className="absolute top-3 left-6 whitespace-nowrap text-black text-lg font-semibold"
-          onClick={() => setIsMenuOpen(false)}
+          onClick={closeMenu}
         >
           ጉZOዬ
-        </Link>
+        </NavLink>
+        <NavLink
+          to="/"
+          className="absolute top-5 right-20 whitespace-nowrap text-black text-sm font-semibold"
+          onClick={() => {
+            closeMenu();
+            handleSignout();
+          }}
+        >
+          Logout
+        </NavLink>
         <img
           src="./icons/closeButton.png"
           alt="Close"
-          className="absolute w-8 h-8 top-3 right-8 cursor-pointer"
-          onClick={() => setIsMenuOpen(false)}
+          className="absolute w-8 h-8 top-3 right-8 hover:cursor-pointer"
+          onClick={closeMenu}
         />
-        <div className="flex flex-col gap-3 mt-12">
+        <div className="flex flex-col gap-3 self-center">
           {navLinks.map((item, index) => (
-            <Link
+            <NavLink
               key={index}
               to={item.path}
-              className="block w-48 border-b-2 border-gray-700 text-left text-black font-semibold"
-              onClick={() => setIsMenuOpen(false)}
+              className="w-48 border-b-2 border-gray-700 text-left text-black font-semibold"
+              onClick={closeMenu}
             >
               {item.display}
-            </Link>
+            </NavLink>
           ))}
         </div>
-        <div className="flex flex-col gap-3 mt-3">
+        <div className="self-center mt-3 flex">
           {currentUser ? (
-            <>
-              <Link to="/profile/user" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  gradientDuoTone="purpleToBlue"
-                  className="text-left text-black font-semibold"
-                >
+            <Dropdown
+              arrowIcon={false}
+              inline
+              label={
+                <div className="w-48 border-b-2 border-gray-700 text-left text-black font-semibold flex flex-row justify-between">
+                  <p className="e">My profile</p>
+                  <img
+                    src="./icons/expandArrow.png"
+                    alt="Expand"
+                    className="w-5 h-5 self-center"
+                  />
+                </div>
+              }
+              className="px-5 py-1 bg-green-400 dark:bg-green-500 border-none"
+            >
+              <NavLink to="/profile/user" onClick={closeMenu}>
+                <Dropdown.Item className="text-black dark:text-black font-semibold">
                   View Profile
-                </Button>
-              </Link>
-              <Link to="/my-bookings" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  gradientDuoTone="purpleToBlue"
-                  className="text-left text-black font-semibold"
-                >
+                </Dropdown.Item>
+              </NavLink>
+              <NavLink to="/my-bookings" onClick={closeMenu}>
+                <Dropdown.Item className="text-black dark:text-black font-semibold">
                   My Bookings
-                </Button>
-              </Link>
-              <Link to="/my-schedule" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  gradientDuoTone="purpleToBlue"
-                  className="text-left text-black font-semibold"
-                >
+                </Dropdown.Item>
+              </NavLink>
+              <NavLink to="/my-schedule" onClick={closeMenu}>
+                <Dropdown.Item className="text-black dark:text-black font-semibold">
                   My Schedule
-                </Button>
-              </Link>
-              <Link to="/my-history" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  gradientDuoTone="purpleToBlue"
-                  className="text-left text-black font-semibold"
-                >
+                </Dropdown.Item>
+              </NavLink>
+              <NavLink to="/my-history" onClick={closeMenu}>
+                <Dropdown.Item className="text-black dark:text-black font-semibold">
                   My History
-                </Button>
-              </Link>
-              <Button
-                gradientDuoTone="purpleToBlue"
-                className="text-left text-black font-semibold"
-                onClick={() => handleSignout()}
-              >
-                Sign Out
-              </Button>
-            </>
+                </Dropdown.Item>
+              </NavLink>
+            </Dropdown>
           ) : (
             <>
-              <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  gradientDuoTone="purpleToBlue"
-                  className="text-left text-black font-semibold"
-                >
+              {" "}
+              <Button
+                gradientDuoTone="purpleToBlue"
+                className="text-left text-black mt-3 dark:text-black font-semibold"
+              >
+                <NavLink to="/login" onClick={closeMenu}>
                   Sign In
-                </Button>
-              </Link>
-              <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  gradientDuoTone="purpleToBlue"
-                  className="text-left text-black font-semibold"
-                >
+                </NavLink>
+              </Button>
+              <Button
+                gradientDuoTone="purpleToBlue"
+                className="text-left text-black   mt-3 dark:text-black font-semibold"
+              >
+                <NavLink to="/register" onClick={closeMenu}>
                   Register
-                </Button>
-              </Link>
+                </NavLink>
+              </Button>
             </>
           )}
         </div>

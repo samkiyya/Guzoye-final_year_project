@@ -19,10 +19,12 @@ import PrivateRoute from "./../components/privateRoutes/PrivateRoute";
 import ManagerRoute from "./../components/privateRoutes/ManagerRoute";
 import AdminRoute from "./../components/privateRoutes/AdminRoute";
 import ToursDetail from "./../pages/TourDetail";
+import Contact from "./../pages/Contact";
 import DashUsers from "./../components/DashUsers";
 import DashProfile from "./../components/DashProfile";
 import MAP from "../pages/MAP/Index";
 import ReturnPage from "./../components/ReturnPage";
+import Search from "../pages/Search";
 
 const Routers = () => {
   return (
@@ -31,12 +33,14 @@ const Routers = () => {
       <Route path="/home" element={<Home />} />
       <Route path="/tours" element={<Tours />} />
       <Route path="/tours/:id" element={<ToursDetail />} />
+      <Route path="tours/search" element={<Search />} />
       <Route path="/packages" element={<Packages />} />
       <Route path="/booking/:Id" element={<Booking />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/tours/search" element={<SearchResultList />} />
       <Route path="/about" element={<About />} />
+      <Route path="/contact-us" element={<Contact />} />
       <Route path="/map" element={<MAP />} />
 
       {/* Protected Routes */}

@@ -24,8 +24,8 @@ cloudinary.config({
 const app = express();
 const port = process.env.PORT || 8000;
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "https://guzoye.onrender.com", //true
-  credentials: false,
+  origin: process.env.FRONTEND_URL || "https://guzoye.onrender.com", //t
+  credentials: false,// false means no cookies
 };
 // Database connection
 connectDB();
