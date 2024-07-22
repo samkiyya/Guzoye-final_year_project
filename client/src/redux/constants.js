@@ -1,4 +1,5 @@
-export const BASE_URL = "http://localhost:5001";
+export const BASE_URL =
+  "http://localhost:5001" || "https://guzoye.onrender.com/register";
 export const AUTH_URL = "/api/auth";
 export const USERS_URL = "/api/users";
 // export const CATEGORY_URL = "/api/category";
