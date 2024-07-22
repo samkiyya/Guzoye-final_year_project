@@ -11,6 +11,7 @@ import bookingRoutes from "./routes/booking";
 import chapaRoutes from "./routes/chapaRoutes";
 import connectDB from "./config/db";
 import path from "path";
+
 import morgan from "morgan";
 import { v2 as cloudinary } from "cloudinary";
 dotenv.config({});
@@ -24,8 +25,8 @@ cloudinary.config({
 const app = express();
 const port = process.env.PORT || 8000;
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "https://guzoye.onrender.com", //t
-  credentials: false,// false means no cookies
+  origin: process.env.FRONTEND_URL || "https://guzoye.onrender.com", //
+  credentials: false, // false means no cookies
 };
 // Database connection
 connectDB();

@@ -16,9 +16,7 @@ const navLinks = [
   { path: "/tours", display: "Tours" },
   { path: "/packages", display: "Packages" },
   { path: "/map", display: "Nearby" },
-
   { path: "/about", display: "About" },
-
   { path: "/contact-us", display: "Contact Us" },
 ];
 
@@ -30,7 +28,7 @@ const Header = () => {
   const { theme } = useSelector((state) => state.theme);
 
   // State for managing menu visibility
-  const setIsMenuOpen = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // This effect can be used for any additional setup if needed
@@ -55,6 +53,7 @@ const Header = () => {
       dispatch(signoutFailure(error.message)); // Failure
     }
   };
+
   // Function to open menu
   const openMenu = () => {
     setIsMenuOpen(true);
@@ -64,13 +63,11 @@ const Header = () => {
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
+
   return (
     <>
-      {" "}
-      {(onload = closeMenu)}
       <Navbar className="sticky top-0 z-10 w-100 py-3 px-4 bg-green-400 dark:bg-green-500 sm:px-10 md:px-16 md:py-5">
         {/** logo start */}
-
         <NavLink
           to="/"
           className="self-center whitespace-nowrap text-black text-lg sm:text-xl font-semibold"
@@ -80,7 +77,7 @@ const Header = () => {
         {/** logo end */}
 
         {/** menu/nav start */}
-        <div className=" hidden sm:flex flex-row gap-10">
+        <div className="hidden sm:flex flex-row gap-10">
           {navLinks.map((item, index) => (
             <NavLink
               key={index}
@@ -111,8 +108,8 @@ const Header = () => {
           <img
             src="./icons/menu.png"
             alt="Menu"
-            className=" self-senter w-7 h-7 ms-4 hover:cursor-pointer sm:hidden"
-            onClick={{ openMenu }}
+            className="self-senter w-7 h-7 ms-4 hover:cursor-pointer sm:hidden"
+            onClick={openMenu} // Corrected here
           />
           {currentUser ? (
             <Dropdown
@@ -175,7 +172,7 @@ const Header = () => {
                 }
                 to="/register"
               >
-                <Button className="text-black  hidden md:inline-block mt-1 border-black bg-red-600 border-0">
+                <Button className="text-black hidden md:inline-block mt-1 border-black bg-red-600 border-0">
                   Register
                 </Button>
               </NavLink>
@@ -186,7 +183,9 @@ const Header = () => {
       {/* Mobile Menu */}
       <div
         id="mobileNav"
-        className=" fixed z-40 flex flex-col w-full h-full py-16 top-0 left-0 bg-green-400 dark:bg-green-500 sm:hidden"
+        className={`fixed z-40 flex flex-col w-full h-full py-16 top-0 left-0 bg-green-400 dark:bg-green-500 sm:hidden ${
+          isMenuOpen ? "block" : "hidden"
+        }`}
       >
         <NavLink
           to="/"
@@ -230,7 +229,7 @@ const Header = () => {
               inline
               label={
                 <div className="w-48 border-b-2 border-gray-700 text-left text-black font-semibold flex flex-row justify-between">
-                  <p className="e">My profile</p>
+                  <p>My profile</p>
                   <img
                     src="./icons/expandArrow.png"
                     alt="Expand"
@@ -263,7 +262,6 @@ const Header = () => {
             </Dropdown>
           ) : (
             <>
-              {" "}
               <Button
                 gradientDuoTone="purpleToBlue"
                 className="text-left text-black mt-3 dark:text-black font-semibold"
@@ -274,7 +272,7 @@ const Header = () => {
               </Button>
               <Button
                 gradientDuoTone="purpleToBlue"
-                className="text-left text-black   mt-3 dark:text-black font-semibold"
+                className="text-left text-black mt-3 dark:text-black font-semibold"
               >
                 <NavLink to="/register" onClick={closeMenu}>
                   Register

@@ -17,7 +17,7 @@ const About = () => {
         <div className="flex flex-col my-5 md:flex-row md:py-16">
           <img
             // src={aboutImg}
-            src="/icons/about.png"
+            src="./icons/about.png"
             className="w-32 h-32 self-center md:w-48 md:h-48"
             alt="Image"
           />
