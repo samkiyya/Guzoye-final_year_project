@@ -1,28 +1,27 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Outlet } from "react-router-dom";
-import Spinner from "./../spinner";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import Spinner from "../spinner";
 
-export default function AdminRoute() {
-  const { currentUser } = useSelector((state) => state.user);
-  const [ok, setOk] = useState(false);
-
-  const authCheck = async () => {
-    const res = await fetch("/api/user/admin-auth", {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-    if (data.check) setOk(true);
-    else setOk(false);
-  };
+const AdminRoute = () => {
+  const { currentUser } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (currentUser !== null) authCheck();
-  }, [currentUser]);
+    if (!currentUser) {
+      navigate("/login?redirect=" + location.pathname);
+    } else if (currentUser.role !== "admin") {
+      navigate("/"); // Redirect to home or any other route
+    } else {
+      setLoading(false);
+    }
+  }, [currentUser, location, navigate]);
 
-  return ok ? <Outlet /> : <Spinner />;
-}
+  if (loading) return <Spinner path="/login" />;
+
+  return <Outlet />;
+};
+
+export default AdminRoute;

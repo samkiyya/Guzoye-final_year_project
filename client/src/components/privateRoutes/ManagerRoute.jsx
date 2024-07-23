@@ -1,38 +1,27 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Outlet, Navigate } from "react-router-dom";
-import Spinner from "./../spinner"; // Fixed import path
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import Spinner from "../spinner";
 
-export default function ManagerRoute() {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
-
-  const { currentUser } = useSelector((state) => state.user);
-  const [ok, setOk] = useState(false);
-
-  const authCheck = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/user/manager-auth`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      if (data.check) setOk(true);
-      else setOk(false);
-    } catch (error) {
-      setOk(false);
-    }
-  };
+const ManagerRoute = () => {
+  const { currentUser } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (currentUser !== null) authCheck();
-  }, [currentUser]);
+    if (!currentUser) {
+      navigate("/login?redirect=" + location.pathname);
+    } else if (currentUser.role !== "manager") {
+      navigate("/"); // Redirect to home or any other route
+    } else {
+      setLoading(false);
+    }
+  }, [currentUser, location, navigate]);
 
-  if (currentUser === null) {
-    return <Navigate to="/login" />;
-  }
+  if (loading) return <Spinner path="/login" />;
 
-  return ok ? <Outlet /> : <Spinner />;
-}
+  return <Outlet />;
+};
+
+export default ManagerRoute;

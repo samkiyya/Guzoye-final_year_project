@@ -49,12 +49,13 @@ export const register = async (
 
     const newUser = await User.create(req.body);
 
-    //create token
     const token = jwt.sign(
       { userId: newUser._id, userRole: newUser.role },
       process.env.JWT_SECRET_KEY as string,
       { expiresIn: "1d" }
     );
+
+    console.log("Generated Token:", token); // Add logging for debugging
 
     res.cookie("auth_token", token, {
       httpOnly: true,
@@ -62,13 +63,11 @@ export const register = async (
       maxAge: 1000 * 60 * 60 * 24,
     });
 
-    res
-      .status(201)
-      .json({
-        message: "User registered successfully",
-        data: { ...newUser },
-        token: token,
-      });
+    res.status(201).json({
+      message: "User registered successfully",
+      data: { ...newUser },
+      token: token,
+    });
   } catch (err) {
     next(err);
     res.status(500).json({ message: "Something went wrong, please try again" });

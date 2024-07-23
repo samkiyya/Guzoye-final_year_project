@@ -93,6 +93,10 @@ export default function Registration() {
         }
 
         localStorage.setItem("token", token);
+        console.log(
+          "Token stored in localStorage:",
+          localStorage.getItem("token")
+        );
 
         // Pass the userId to getUser function
         const user = await getUser(userData._id);

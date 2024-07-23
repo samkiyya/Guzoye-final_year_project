@@ -16,7 +16,7 @@ export default function DashSidebar() {
   const location = useLocation();
   const [tab, setTab] = useState("");
   const dispatch = useDispatch();
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.auth); // Ensure the correct state selector
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -41,7 +41,7 @@ export default function DashSidebar() {
 
   const handleSignout = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/user/logout`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: "POST",
       });
       const data = await res.json();
@@ -55,6 +55,11 @@ export default function DashSidebar() {
       console.error("Sign out error:", error.message);
     }
   };
+
+  // Ensure currentUser is defined before rendering sidebar items
+  if (!currentUser) {
+    return <div>Loading...</div>; // or any other placeholder UI
+  }
 
   return (
     <Sidebar className="w-full md:w-56">

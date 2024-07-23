@@ -64,25 +64,42 @@ export default function Login() {
 
     try {
       const authAPI = await login(form).unwrap();
-      const token = authAPI.data.token; // Adjust according to your API response
+      const { token, role, id, firstName, username, profileImg } = authAPI.data;
+
       localStorage.setItem("token", token);
 
       dispatch(
         setCredentials({
-          id: authAPI.data.id,
-          firstName: authAPI.data.firstName,
-          email: authAPI.data.email,
-          role: authAPI.data.role,
-          token: token,
-          profileImg: authAPI.data.profileImg, // If applicable
+          id,
+          firstName,
+          username,
+          email: form.email,
+          role,
+          token,
+          profileImg,
         })
       );
 
-      setServerError("");
-      navigate(redirect);
+      // Redirect based on role
+      navigate(getRedirectPath(role) || redirect);
     } catch (error) {
       console.error("Login Error:", error);
       setServerError(error.message || "Failed to login. Please try again.");
+    }
+  };
+
+  const getRedirectPath = (role) => {
+    switch (role) {
+      case "admin":
+        return "/admin/dashboard";
+      case "manager":
+        return "/manager/dashboard";
+      case "traveler":
+        return "/traveler/dashboard";
+      case "guide":
+        return "/guide/dashboard";
+      default:
+        return "/";
     }
   };
 
@@ -111,7 +128,7 @@ export default function Login() {
         })
       ).unwrap();
       console.log("Log in success:", res);
-      navigate(redirect);
+      navigate(getRedirectPath(res.role) || redirect);
     } catch (err) {
       setServerError("Google login failed");
     }

@@ -69,21 +69,21 @@ const Home = () => {
             with its astonishing rock-hewn churches, Axum with its towering
             obelisks, and Gondar&apos;s royal castles dating back to the 17th
             century. {}
-            <p>
-              In addition to its historical sites, Ethiopia boasts a wealth of
-              natural beauty. The Simien Mountains, a UNESCO-recognized national
-              park, offer breathtaking vistas and opportunities for trekking
-              amidst endemic wildlife such as the Ethiopian wolf and gelada
-              baboon. The Danakil Depression, one of the hottest and lowest
-              places on Earth, presents an otherworldly landscape of bubbling
-              lava lakes and salt flats, offering intrepid travelers a glimpse
-              into the Earth&apos;s geological wonders. Moreover,
-              Ethiopia&apos;s cuisine is a highlight in itself. Known for its
-              unique flavors and diverse dishes, Ethiopian food, such as injera
-              (a sourdough flatbread) served with spicy stews (wats), offers a
-              culinary adventure that tantalizes the taste buds and reflects the
-              country&apos;s agrarian heritage.{" "}
-            </p>
+          </p>
+          <p className="text-md md:text-xl md:text-center md:leading-9">
+            In addition to its historical sites, Ethiopia boasts a wealth of
+            natural beauty. The Simien Mountains, a UNESCO-recognized national
+            park, offer breathtaking vistas and opportunities for trekking
+            amidst endemic wildlife such as the Ethiopian wolf and gelada
+            baboon. The Danakil Depression, one of the hottest and lowest places
+            on Earth, presents an otherworldly landscape of bubbling lava lakes
+            and salt flats, offering intrepid travelers a glimpse into the
+            Earth&apos;s geological wonders. Moreover, Ethiopia&apos;s cuisine
+            is a highlight in itself. Known for its unique flavors and diverse
+            dishes, Ethiopian food, such as injera (a sourdough flatbread)
+            served with spicy stews (wats), offers a culinary adventure that
+            tantalizes the taste buds and reflects the country&apos;s agrarian
+            heritage.{" "}
           </p>
         </div>
       </div>

@@ -54,7 +54,7 @@ router.get(
 );
 
 // User routes
-router.put("/:id", verifyToken, verifyRole(["traveler"]), updateUser);
+router.put("/:id", verifyToken, updateUser);
 
 router.put(
   "/update-profile-photo/:id",

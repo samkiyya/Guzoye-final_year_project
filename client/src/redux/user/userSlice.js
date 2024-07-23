@@ -4,6 +4,7 @@ const initialState = {
   currentUser: localStorage.getItem("currentUser")
     ? JSON.parse(localStorage.getItem("currentUser"))
     : null,
+  token: localStorage.getItem("token") || null,
   error: null,
   loading: false,
 };
@@ -17,8 +18,10 @@ const userSlice = createSlice({
       state.error = null;
     },
     updateSuccess: (state, action) => {
-      state.currentUser = action.payload;
-      localStorage.setItem("currentUser", JSON.stringify(action.payload));
+      state.currentUser = action.payload.user;
+      state.token = action.payload.token; // Assuming the API returns a token
+      localStorage.setItem("currentUser", JSON.stringify(action.payload.user));
+      localStorage.setItem("token", action.payload.token);
       state.loading = false;
       state.error = null;
     },
@@ -32,10 +35,13 @@ const userSlice = createSlice({
     },
     deleteUserSuccess: (state) => {
       state.currentUser = null;
+      state.token = null;
       localStorage.removeItem("currentUser");
+      localStorage.removeItem("token");
       state.loading = false;
       state.error = null;
     },
+
     deleteUserFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;

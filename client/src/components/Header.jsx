@@ -127,7 +127,8 @@ const Header = () => {
               className="hidden sm:inline p-5"
             >
               <Dropdown.Header>
-                <span className="block text-sm">@{currentUser.username}</span>
+                <span className="block text-sm">{currentUser.username}</span>
+                <span className="block text-sm">{currentUser.email}</span>
               </Dropdown.Header>
               <NavLink to="/dashboard?tab=profile">
                 <Dropdown.Item>Profile</Dropdown.Item>
@@ -168,7 +169,7 @@ const Header = () => {
               </NavLink>
               <NavLink
                 className={({ isActive }) =>
-                  isActive ? "nav-link active" : "nav-link"
+                  isActive ? "nav-link active " : "nav-link"
                 }
                 to="/register"
               >

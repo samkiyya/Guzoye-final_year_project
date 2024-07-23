@@ -20,7 +20,6 @@ export const getUser = async (
     next(error);
   }
 };
-// Update User details
 export const updateUser = async (
   req: Request,
   res: Response,
@@ -120,6 +119,9 @@ export const updateUser = async (
       }),
     };
 
+    console.log("Request Body:", req.body);
+    console.log("Update Details:", updatedUserDetails);
+
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { $set: updatedUserDetails },
@@ -129,6 +131,8 @@ export const updateUser = async (
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    console.log("Updated User:", updatedUser);
 
     res.status(200).json({
       success: true,

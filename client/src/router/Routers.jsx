@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "./../pages/Home";
 import Tours from "./../pages/Tours";
 import Packages from "./../pages/Packages";
@@ -29,13 +29,13 @@ import Search from "../pages/Search";
 const Routers = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/home" />} />
+      <Route path="/" element={<Home />} />
       <Route path="/home" element={<Home />} />
       <Route path="/tours" element={<Tours />} />
       <Route path="/tours/:id" element={<ToursDetail />} />
-      <Route path="tours/search" element={<Search />} />
+      <Route path="/tours/search" element={<Search />} />
       <Route path="/packages" element={<Packages />} />
-      <Route path="/booking/:Id" element={<Booking />} />
+      <Route path="/booking/:id" element={<Booking />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/tours/search" element={<SearchResultList />} />
@@ -46,17 +46,17 @@ const Routers = () => {
       {/* Protected Routes */}
       <Route element={<PrivateRoute />}>
         <Route path="/dashboard" element={<Dashboard />}>
-          {/* Nested dashboard routes */}
           <Route path="profile" element={<DashProfile />} />
           <Route path="users" element={<DashUsers />} />
         </Route>
         <Route path="/schedule" element={<Schedule />} />
-        <Route path="/createSchedule" element={<CreateSchedule />} />
+        <Route path="/create-schedule" element={<CreateSchedule />} />
         <Route path="/quiz" element={<Quiz />} />
       </Route>
 
       {/* Admin Routes */}
       <Route element={<AdminRoute />}>
+        <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/admin/users" element={<DashUsers />} />
       </Route>
 

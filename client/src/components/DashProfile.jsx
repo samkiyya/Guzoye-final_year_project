@@ -31,8 +31,7 @@ import "react-circular-progressbar/dist/styles.css";
 
 export default function Profile() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
-
-  const { currentUser, error, loading } = useSelector((state) => state.user);
+  const { currentUser, token } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const filePickerRef = useRef(null);
@@ -43,12 +42,19 @@ export default function Profile() {
   const [imageFileUploading, setImageFileUploading] = useState(false);
   const [updateUserSuccessMessage, setUpdateUserSuccessMessage] =
     useState(null);
-  // const [isGuide, setIsGuide] = useState(false);
-
   const [updateUserErrorMessage, setUpdateUserErrorMessage] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [activePanelId, setActivePanelId] = useState(1);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    address: "",
+    phone: "",
+    userProfileImg: "",
+    skill: "",
+  });
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -57,19 +63,20 @@ export default function Profile() {
       setImageFileUrl(URL.createObjectURL(file));
     }
   };
-  console.log(currentUser.userProfileImg);
+
   useEffect(() => {
-    if (currentUser !== null) {
+    if (currentUser) {
       setFormData({
-        firstName: currentUser.firstName,
-        LastName: currentUser.LastName,
-        username: currentUser.username,
-        email: currentUser.email,
-        address: currentUser.address,
-        phone: currentUser.phone,
-        userProfileImg: currentUser.userProfileImg,
+        firstName: currentUser.firstName || "",
+        lastName: currentUser.lastName || "",
+        username: currentUser.username || "",
+        email: currentUser.email || "",
+        address: currentUser.address || "",
+        phone: currentUser.phone || "",
+        userProfileImg: currentUser.userProfileImg || "",
+        skill: currentUser.skill || "",
       });
-      setImageFileUrl(currentUser.userProfileImg);
+      setImageFileUrl(currentUser.userProfileImg || "");
     }
   }, [currentUser]);
 
@@ -79,13 +86,26 @@ export default function Profile() {
     }
   }, [imageFile]);
 
+  const handleChange = (e) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [e.target.id]: e.target.value,
+    }));
+  };
+
   const uploadImage = async () => {
+    if (!imageFile) return;
+
     setImageFileUploading(true);
     setImageFileUploadError(null);
     const storage = getStorage(app);
-    const fileName = new Date().getTime() + imageFile.name.replace(/\s/g, "");
+    const fileName = `${new Date().getTime()}-${imageFile.name.replace(
+      /\s/g,
+      ""
+    )}`;
     const storageRef = ref(storage, `profile-photos/${fileName}`);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -101,42 +121,45 @@ export default function Profile() {
         setImageFile(null);
         setImageFileUrl(null);
         setImageFileUploading(false);
-        console.log(error);
+        console.error(error);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImageFileUrl(downloadURL);
-          setFormData({ ...formData, userProfileImg: downloadURL });
+          setImageFileUrl(downloadURL); // Ensure the image URL is updated
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            userProfileImg: downloadURL,
+          }));
           setImageFileUploading(false);
         });
       }
     );
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUpdateUserErrorMessage(null);
     setUpdateUserSuccessMessage(null);
+
     if (imageFileUploading) {
-      setUpdateUserErrorMessage("Please wait for image to upload");
+      setUpdateUserErrorMessage("Please wait for the image to upload");
       return;
     }
+
     try {
       dispatch(updateStart());
-      const res = await fetch(
-        `${API_BASE_URL}/api/user/update/${currentUser._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      if (!token) {
+        setUpdateUserErrorMessage("No token found. Please log in.");
+        return;
+      }
+      const res = await fetch(`${API_BASE_URL}/api/users/${currentUser?._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
       const data = await res.json();
       if (!res.ok) {
         dispatch(updateFailure(data.message));
@@ -152,16 +175,13 @@ export default function Profile() {
   };
 
   const handleDeleteUser = async (e) => {
-    setShowModal(false);
     e.preventDefault();
-    const CONFIRM = confirm(
-      "Are you sure ? the account will be permanently deleted!"
-    );
-    if (CONFIRM) {
+    setShowModal(false);
+    if (confirm("Are you sure? The account will be permanently deleted!")) {
       try {
         dispatch(deleteUserStart());
         const res = await fetch(
-          `${API_BASE_URL}/api/user/delete/${currentUser._id}`,
+          `${API_BASE_URL}/api/users/delete/${currentUser?._id}`,
           {
             method: "DELETE",
           }
@@ -170,7 +190,6 @@ export default function Profile() {
         if (!res.ok) {
           dispatch(deleteUserFailure(data.message));
           alert("Something went wrong!");
-          return;
         } else {
           dispatch(deleteUserSuccess(data));
           alert(data?.message);
@@ -190,14 +209,13 @@ export default function Profile() {
       const data = await res.json();
       if (!res.ok) {
         dispatch(signoutFailure(data.message));
-        console.log(data.message);
-        return;
+        console.error(data.message);
       } else {
         dispatch(signoutSuccess());
         navigate("/login");
       }
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
     }
   };
 
@@ -239,7 +257,11 @@ export default function Profile() {
               />
             )}
             <img
-              src={imageFileUrl || currentUser.userProfileImg}
+              src={
+                imageFileUrl ||
+                currentUser?.userProfileImg ||
+                "default-profile.png"
+              }
               alt="user"
               className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${
                 imageFileUploadProgress &&
@@ -254,89 +276,21 @@ export default function Profile() {
           <Alert color="failure">{imageFileUploadError}</Alert>
         )}
 
-        {currentUser.role === "guide" && (
+        {currentUser?.role === "guide" && (
           <Link to="/quiz" className="self-center underline text-green-600">
             Take a quiz and improve your profile
           </Link>
         )}
 
-        <TextInput
-          type="text"
-          id="firstName"
-          placeholder="Your First Name"
-          defaultValue={currentUser.firstName}
-          onChange={handleChange}
-        />
-        <TextInput
-          type="text"
-          id="lastName"
-          placeholder="Your Last Name"
-          defaultValue={currentUser.LastName}
-          onChange={handleChange}
-        />
-        <TextInput
-          type="text"
-          id="username"
-          placeholder="username"
-          value={currentUser.username}
-          onChange={handleChange}
-        />
-        <TextInput
-          type="email"
-          id="email"
-          placeholder="email"
-          value={currentUser.email}
-          onChange={handleChange}
-        />
-        {currentUser.role === "guide" && (
+        {currentUser?.role === "guide" && (
           <TextInput
             type="text"
             id="skill"
-            placeholder="skill"
-            defaultValue={currentUser.skill}
+            placeholder="Skill"
+            value={formData.skill || ""}
             onChange={handleChange}
           />
         )}
-        <TextInput
-          type="password"
-          id="password"
-          placeholder="password"
-          onChange={handleChange}
-        />
-        <TextInput
-          type="text"
-          id="phone"
-          placeholder="phone"
-          value={currentUser.phone}
-          onChange={handleChange}
-        />
-        <TextInput
-          type="text"
-          id="address"
-          placeholder="address"
-          value={formData.address}
-          onChange={handleChange}
-        />
-        <Button
-          type="submit"
-          gradientDuoTone="purpleToBlue"
-          outline
-          disabled={loading || imageFileUploading}
-        >
-          {loading ? "Loading..." : "Update"}
-        </Button>
-
-        {/* {currentUser.isAdmin && (
-          <Link to={"/create-post"}>
-            <Button
-              type="button"
-              gradientDuoTone="purpleToPink"
-              className="w-full"
-            >
-              Create Post
-            </Button>
-          </Link>
-        )} */}
       </form>
       <div className="mt-5">
         <Button
@@ -362,7 +316,7 @@ export default function Profile() {
           className="w-full mb-3"
         >
           {activePanelId === 3 && "❯"} My History
-        </Button>{" "}
+        </Button>
         <div className="text-red-500 flex justify-between mt-5">
           <span onClick={() => setShowModal(true)} className="cursor-pointer">
             Delete Account
@@ -379,12 +333,6 @@ export default function Profile() {
         {updateUserErrorMessage && (
           <Alert color="failure" className="mt-5">
             {updateUserErrorMessage}
-          </Alert>
-        )}
-        {/* check the use */}
-        {error && (
-          <Alert color="failure" className="mt-5">
-            {error}
           </Alert>
         )}
       </div>

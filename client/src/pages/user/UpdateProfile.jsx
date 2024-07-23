@@ -147,6 +147,21 @@ const UpdateProfile = () => {
       {updateProfileDetailsPanel === true ? (
         <div className="flex flex-col border self-center border-black rounded-lg p-2 w-72 h-fit gap-2 sm:w-[320px]">
           <h1 className="text-2xl text-center font-semibold">Update Profile</h1>
+
+          <input
+            type="text"
+            id="firstName"
+            placeholder="Your First Name"
+            value={formData.firstName}
+            onChange={handleChange}
+          />
+          <input
+            type="text"
+            id="lastName"
+            placeholder="Your Last Name"
+            value={formData.lastName}
+            onChange={handleChange}
+          />
           <div className="flex flex-col">
             <label htmlFor="username" className="font-semibold">
               Username:

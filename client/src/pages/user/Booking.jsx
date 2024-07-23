@@ -32,7 +32,7 @@ const Booking = () => {
     packageDetails: null,
     buyer: null,
     persons: 1,
-    date: null,
+    date: "",
   });
   const [currentDate, setCurrentDate] = useState("");
 
@@ -44,30 +44,15 @@ const Booking = () => {
       );
       const data = await res.json();
       if (data?.success) {
-        setPackageData({
-          packageName: data?.packageData?.packageName,
-          packageDescription: data?.packageData?.packageDescription,
-          packageDestination: data?.packageData?.packageDestination,
-          packageDays: data?.packageData?.packageDays,
-          packageNights: data?.packageData?.packageNights,
-          packageAccommodation: data?.packageData?.packageAccommodation,
-          packageTransportation: data?.packageData?.packageTransportation,
-          packageMeals: data?.packageData?.packageMeals,
-          packageActivities: data?.packageData?.packageActivities,
-          packagePrice: data?.packageData?.packagePrice,
-          packageDiscountPrice: data?.packageData?.packageDiscountPrice,
-          packageOffer: data?.packageData?.packageOffer,
-          packageRating: data?.packageData?.packageRating,
-          packageTotalRatings: data?.packageData?.packageTotalRatings,
-          packageImages: data?.packageData?.packageImages,
-        });
+        setPackageData(data?.packageData);
         setLoading(false);
       } else {
-        setLoading(false);
         alert(data?.message || "Something went wrong!");
+        setLoading(false);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching package data:", error);
+      setLoading(false);
     }
   };
 
@@ -75,39 +60,37 @@ const Booking = () => {
     if (params?.packageId) {
       getPackageData();
     }
-    let date = new Date().toISOString().substring(0, 10);
-    let d = date.substring(0, 8) + (parseInt(date.substring(8)) + 1);
-    setCurrentDate(d);
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    setCurrentDate(date.toISOString().substring(0, 10));
   }, [params?.packageId]);
 
   useEffect(() => {
-    if (packageData && params?.packageId) {
-      setBookingData({
-        ...bookingData,
+    if (packageData) {
+      setBookingData((prev) => ({
+        ...prev,
         packageDetails: params?.packageId,
         buyer: currentUser?._id,
         totalPrice: packageData?.packageDiscountPrice
-          ? packageData?.packageDiscountPrice * bookingData?.persons
-          : packageData?.packagePrice * bookingData?.persons,
-      });
+          ? packageData?.packageDiscountPrice * prev.persons
+          : packageData?.packagePrice * prev.persons,
+      }));
     }
-  }, [packageData, params]);
+  }, [packageData, params?.packageId, currentUser?._id, bookingData.persons]);
 
-  // Handle payment & book package
   const handleBookPackage = async () => {
     if (
-      bookingData.packageDetails === "" ||
-      bookingData.buyer === "" ||
+      !bookingData.packageDetails ||
+      !bookingData.buyer ||
       bookingData.totalPrice <= 0 ||
       bookingData.persons <= 0 ||
-      bookingData.date === ""
+      !bookingData.date
     ) {
       alert("All fields are required!");
       return;
     }
     try {
       setLoading(true);
-      // Proceed with Chapa payment
       const chapaRes = await axios.post(
         `${API_BASE_URL}/api/chapa/initialize-payment`,
         {
@@ -118,16 +101,15 @@ const Booking = () => {
           // other necessary booking data
         }
       );
-
       const data = chapaRes.data;
       if (data.success) {
         window.location.href = data.checkout_url;
       } else {
         alert(data.message);
-        setLoading(false);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error initializing payment:", error);
+    } finally {
       setLoading(false);
     }
   };
@@ -136,7 +118,7 @@ const Booking = () => {
     <div className="w-full flex flex-col items-center">
       <div className="w-[95%] flex flex-col items-center p-6 rounded shadow-2xl gap-3">
         <h1 className="text-center font-bold text-2xl">Book Package</h1>
-        {/* user info */}
+        {/* User Info */}
         <div className="w-full flex flex-wrap justify-center gap-2">
           <div className="pr-3 md:border-r md:pr-6">
             <div className="flex flex-col p-2 w-64 xsm:w-72 h-fit gap-2">
@@ -149,7 +131,7 @@ const Booking = () => {
                   id="username"
                   className="p-1 rounded border border-black"
                   value={currentUser.username}
-                  disabled
+                  readOnly
                 />
               </div>
               <div className="flex flex-col">
@@ -161,7 +143,7 @@ const Booking = () => {
                   id="email"
                   className="p-1 rounded border border-black"
                   value={currentUser.email}
-                  disabled
+                  readOnly
                 />
               </div>
               <div className="flex flex-col">
@@ -170,11 +152,10 @@ const Booking = () => {
                 </label>
                 <textarea
                   maxLength={200}
-                  type="text"
                   id="address"
                   className="p-1 rounded border border-black resize-none"
                   value={currentUser.address}
-                  disabled
+                  readOnly
                 />
               </div>
               <div className="flex flex-col">
@@ -186,12 +167,12 @@ const Booking = () => {
                   id="phone"
                   className="p-1 rounded border border-black"
                   value={currentUser.phone}
-                  disabled
+                  readOnly
                 />
               </div>
             </div>
           </div>
-          {/* package info */}
+          {/* Package Info */}
           <div className="pl-3 md:border-l md:pl-6">
             <div className="flex flex-col gap-1">
               <div className="flex flex-wrap gap-2">
@@ -207,7 +188,7 @@ const Booking = () => {
                   <p className="flex gap-2 text-green-700 font-semibold capitalize">
                     <FaMapMarkerAlt /> {packageData.packageDestination}
                   </p>
-                  {/* days & nights */}
+                  {/* Days & Nights */}
                   {(+packageData.packageDays > 0 ||
                     +packageData.packageNights > 0) && (
                     <p className="flex items-center gap-2">
@@ -233,15 +214,18 @@ const Booking = () => {
                 </label>
                 <input
                   type="date"
-                  min={currentDate !== "" ? currentDate : ""}
+                  min={currentDate}
                   id="date"
                   className="w-max border rounded"
                   onChange={(e) => {
-                    setBookingData({ ...bookingData, date: e.target.value });
+                    setBookingData((prev) => ({
+                      ...prev,
+                      date: e.target.value,
+                    }));
                   }}
                 />
               </div>
-              {/* price */}
+              {/* Price */}
               <p className="flex gap-1 text-xl font-semibold my-1">
                 Price:
                 {packageData.packageOffer ? (
@@ -266,21 +250,20 @@ const Booking = () => {
                   </span>
                 )}
               </p>
-              {/* price */}
+              {/* Number of Persons */}
               <div className="flex border-2 w-max">
                 <button
                   className="p-2 py-1 font-semibold"
                   onClick={() => {
                     if (bookingData.persons > 1) {
-                      setBookingData({
-                        ...bookingData,
-                        persons: bookingData.persons - 1,
+                      setBookingData((prev) => ({
+                        ...prev,
+                        persons: prev.persons - 1,
                         totalPrice: packageData.packageDiscountPrice
                           ? packageData.packageDiscountPrice *
-                            (bookingData.persons - 1)
-                          : packageData.packagePrice *
-                            (bookingData.persons - 1),
-                      });
+                            (prev.persons - 1)
+                          : packageData.packagePrice * (prev.persons - 1),
+                      }));
                     }
                   }}
                 >
@@ -288,7 +271,7 @@ const Booking = () => {
                 </button>
                 <input
                   value={bookingData.persons}
-                  disabled
+                  readOnly
                   type="text"
                   className="border w-10 text-center text-lg"
                 />
@@ -296,15 +279,14 @@ const Booking = () => {
                   className="p-2 py-1 font-semibold"
                   onClick={() => {
                     if (bookingData.persons < 10) {
-                      setBookingData({
-                        ...bookingData,
-                        persons: bookingData.persons + 1,
+                      setBookingData((prev) => ({
+                        ...prev,
+                        persons: prev.persons + 1,
                         totalPrice: packageData.packageDiscountPrice
                           ? packageData.packageDiscountPrice *
-                            (bookingData.persons + 1)
-                          : packageData.packagePrice *
-                            (bookingData.persons + 1),
-                      });
+                            (prev.persons + 1)
+                          : packageData.packagePrice * (prev.persons + 1),
+                      }));
                     }
                   }}
                 >
@@ -314,10 +296,7 @@ const Booking = () => {
               <p className="text-xl font-semibold">
                 Total Price:
                 <span className="text-green-700">
-                  $
-                  {packageData.packageDiscountPrice
-                    ? packageData.packageDiscountPrice * bookingData.persons
-                    : packageData.packagePrice * bookingData.persons}
+                  ${bookingData.totalPrice}
                 </span>
               </p>
               <div className="my-2 max-w-[300px] gap-1">

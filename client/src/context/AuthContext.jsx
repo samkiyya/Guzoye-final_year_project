@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { getUser } from "../api/userAPI";
 import PropTypes from "prop-types";
+import { decodeToken } from "../utils/tokenUtils";
 
 // Create the context
 export const AuthContext = createContext();
@@ -12,27 +13,42 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoading(true);
+
     const getUserData = async () => {
       if (token) {
-        const user = await getUser();
-        if (user) {
-          setAuthUser({
-            _id: user._id,
-            email: user.email,
-            username: user.username,
-            firstName: user.firstName,
-            token: token,
-          });
-        } else {
+        try {
+          const decodedToken = decodeToken(token); // Extract user info from token
+          const userId = decodedToken.id; // Adjust this line based on your token structure
+
+          if (userId) {
+            const user = await getUser(userId); // Pass userId to getUser
+            if (user) {
+              setAuthUser({
+                _id: user._id,
+                email: user.email,
+                username: user.username,
+                firstName: user.firstName,
+                token: token,
+              });
+            } else {
+              setAuthUser(null);
+            }
+          } else {
+            setAuthUser(null);
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
           setAuthUser(null);
-          setIsLoading(false);
         }
+      } else {
+        setAuthUser(null);
       }
       setIsLoading(false);
     };
 
     getUserData();
   }, []);
+
   return (
     <AuthContext.Provider
       value={{ authUser, setAuthUser, isLoading, setIsLoading }}
